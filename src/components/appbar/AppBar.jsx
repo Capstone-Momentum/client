@@ -7,7 +7,9 @@ import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
-import { Grid } from '@material-ui/core';
+import { Grid, Button } from '@material-ui/core';
+import { useHistory } from "react-router-dom";
+import { LANDING, INTERACTIVE_MAP, INITATIVES, ACCOUNT, CUSTOMIZATION, TUTORIALS, CONTACT_US } from '../../constants';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -64,28 +66,51 @@ const useStyles = makeStyles(theme => ({
             },
         },
     },
+    button: {
+        textTransform: 'none'
+    },
+    noHoverButton: {
+        textTransform: 'none',
+        "&:hover": {
+            backgroundColor: "transparent"
+        }
+    }
 }));
-
 
 export default function AppBar() {
     const classes = useStyles();
+    let history = useHistory()
 
     const title = (
-        <Typography className={classes.title} variant="h6" noWrap>
-            Hourglass Project
-        </Typography>
+        <Button className={classes.noHoverButton} onClick={() => history.push(LANDING)}>
+            <Typography className={classes.title} variant="h6" noWrap>
+                Hourglass Project
+            </Typography>
+        </Button>
     )
 
+    const menuItems = [
+        { name: 'Interactive Map', route: INTERACTIVE_MAP },
+        { name: 'Initatives', route: INITATIVES },
+        { name: 'Customization', route: CUSTOMIZATION },
+        { name: 'Tutorials', route: TUTORIALS },
+        { name: 'Contact Us', route: CONTACT_US },
+        { name: 'Account', route: ACCOUNT },
+    ]
     const menu = (
         <Grid container direction='row' alignItems='center' spacing={3}>
             <Grid item xs={2}>
                 {title}
             </Grid>
-            <Grid item>
-                <Typography>
-                    Interactive Map
-                </Typography>
-            </Grid>
+            {menuItems.map(menuItem => (
+                <Grid item>
+                    <Button className={classes.button} onClick={() => history.push(menuItem.route)}>
+                        <Typography className={classes.title} variant="body1" noWrap>
+                            {menuItem.name}
+                        </Typography>
+                    </Button>
+                </Grid>
+            ))}
         </Grid>
     )
 
@@ -106,7 +131,7 @@ export default function AppBar() {
     )
 
     const accountIcon = (
-        <IconButton>
+        <IconButton onClick={() => history.push(ACCOUNT)}>
             <AccountCircleIcon fontSize='large' />
         </IconButton>
     )
