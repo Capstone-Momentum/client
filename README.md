@@ -1,12 +1,25 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Set Up your Machine
+
+### Initial Steps
+On Windows, we recommend you install Git Bash via https://gitforwindows.org/.
+
+On Mac, we recommend you install Homebrew via https://brew.sh/, then you can run brew install git.
+
+All machines should have the latest version of Python installed via https://www.python.org/downloads/.
+
+### Clone this Repo
+`git clone https://github.com/Capstone-Momentum/client.git`.
+
+### Build required dependencies
+Install Node Package Manager via https://nodejs.org/en/download/.
+
+Run `npm i` to ensure that your machine is up-to-date with the correct versions of required packages.
+
 ## Available Scripts
 
 In the project directory, you can run:
-
-### `npm i`
-
-This builds the required dependencies and ensures that your machine is up-to-date with the correct versions of required packages.
 
 ### `npm start`
 
