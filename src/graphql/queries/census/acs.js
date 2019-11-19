@@ -1,0 +1,6 @@
+import { graphqlQuery } from "../../util";
+
+export async function test() {
+    return graphqlQuery('acs1Variable(tableName: "census_acs1_detailed", variableName:"B19037E_030E", year: 2018)')
+}
+

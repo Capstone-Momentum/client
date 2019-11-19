@@ -10,6 +10,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { Grid, Button } from '@material-ui/core';
 import { useHistory } from "react-router-dom";
 import { LANDING, INTERACTIVE_MAP, INITATIVES, ACCOUNT, CUSTOMIZATION, TUTORIALS, CONTACT_US } from '../../constants';
+import { test } from '../../graphql/queries/census/acs';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -131,7 +132,11 @@ export default function AppBar() {
     )
 
     const accountIcon = (
-        <IconButton onClick={() => history.push(ACCOUNT)}>
+        <IconButton onClick={async () => {
+            history.push(ACCOUNT)
+            const resp = await test()
+            console.log(resp)
+        }}>
             <AccountCircleIcon fontSize='large' />
         </IconButton>
     )
