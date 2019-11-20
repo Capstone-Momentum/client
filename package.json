@@ -7,6 +7,7 @@
     "@material-ui/icons": "^4.5.1",
     "aws-sdk": "^2.574.0",
     "citysdk": "^2.0.37",
+    "downshift": "^3.4.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
