@@ -152,10 +152,10 @@ const useStyles = makeStyles(theme => ({
 
 export default function Autocomplete(props) {
     const classes = useStyles();
-    const { label, placeholder, suggestions, onChange_, selectedItem, containerStyle } = props
+    const { label, placeholder, suggestions, onChange, selectedItem, containerStyle } = props
 
     return (
-        <Downshift id="downshift-options">
+        <Downshift id="downshift-options" onChange={onChange}>
             {({
                 clearSelection,
                 getInputProps,
@@ -172,8 +172,6 @@ export default function Autocomplete(props) {
                         if (event.target.value === '') {
                             clearSelection();
                         }
-                        onChange_(event.target.value)
-
                     },
                     onFocus: openMenu,
                     placeholder: placeholder,
