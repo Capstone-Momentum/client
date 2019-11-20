@@ -9,7 +9,7 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import { Grid, Button } from '@material-ui/core';
 import { useHistory } from "react-router-dom";
-import { LANDING, INTERACTIVE_MAP, INITATIVES, ACCOUNT, CUSTOMIZATION, TUTORIALS, CONTACT_US } from '../../constants';
+import { LANDING, INTERACTIVE_MAP, INITATIVES, ACCOUNT, CUSTOMIZATION, TUTORIALS, CONTACT_US, EXPLORE } from '../../constants';
 import { test } from '../../graphql/queries/census/acs';
 
 const useStyles = makeStyles(theme => ({
@@ -94,6 +94,7 @@ export default function AppBar() {
         { name: 'Interactive Map', route: INTERACTIVE_MAP },
         { name: 'Initatives', route: INITATIVES },
         { name: 'Customization', route: CUSTOMIZATION },
+        { name: 'Explore', route: EXPLORE },
         { name: 'Tutorials', route: TUTORIALS },
         { name: 'Contact Us', route: CONTACT_US },
         { name: 'Account', route: ACCOUNT },

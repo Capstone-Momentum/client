@@ -26,6 +26,11 @@ export default function InteractiveMap() {
                         react-simple-maps
                 </Link>
                 </ListItem>
+                <ListItem>
+                    <Link href='https://github.com/uscensusbureau/citysdk'>
+                        Census JavascriptSDK
+                </Link>
+                </ListItem>
             </List>
         </Grid>
     )

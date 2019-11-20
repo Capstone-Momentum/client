@@ -1,22 +1,13 @@
 import { GRAPHQL_ROUTE } from '../constants';
 
-export function executeGraphql(command, requestType) {
+export function executeGraphql(query) {
     return fetch(GRAPHQL_ROUTE, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         },
-        body: JSON.stringify({ query: `${requestType} { ${command} }` })
+        body: JSON.stringify({ "query": query })
     })
         .then(r => r.json())
 }
-
-export function graphqlQuery(queryString) {
-    return executeGraphql(queryString, 'query')
-}
-
-export function graphqlMutation(mutationString) {
-    return executeGraphql(mutationString, 'mutation')
-}
-
