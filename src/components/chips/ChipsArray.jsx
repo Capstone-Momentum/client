@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
-import TagFacesIcon from '@material-ui/icons/TagFaces';
+import { Container, Tooltip } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,46 +13,54 @@ const useStyles = makeStyles(theme => ({
     },
     chip: {
         margin: theme.spacing(0.5),
+        color: 'white'
     },
 }));
 
-// data items can also include onClick
-const mockChipData = [
-    { key: 0, label: 'Angular' },
-    { key: 1, label: 'jQuery' },
-    { key: 2, label: 'Polymer' },
-    { key: 3, label: 'React' },
-    { key: 4, label: 'Vue.js' },
-]
+// Note: data items can also include an onClick callback
+// const mockChipData = [
+//     { key: 0, label: 'Angular' },
+//     { key: 1, label: 'jQuery' },
+//     { key: 2, label: 'Polymer' },
+//     { key: 3, label: 'React' },
+//     { key: 4, label: 'Vue.js' },
+// ]
 
 export default function ChipsArray(props) {
     const classes = useStyles();
-    const { data, setData } = props
+    const { data, setData, onPaper, color, chipStyle } = props
 
     const handleDelete = chipToDelete => () => {
         setData(chips => chips.filter(chip => chip.key !== chipToDelete.key));
     };
 
-    return (
-        <Paper className={classes.root}>
-            {data.map(item => {
-                let icon;
+    const chips = data.map(item => {
+        return (item.tooltip) ? (
+            <Tooltip title={item.tooltip} justify={item.justifyTooltip}>
+                <Chip
+                    key={item.key}
+                    label={item.label}
+                    onClick={item.onClick}
+                    onDelete={setData ? handleDelete(item) : undefined}
+                    className={chipStyle ? chipStyle : classes.chip}
+                    color={color}
+                />
+            </Tooltip>
+        ) : (
+                <Chip
+                    key={item.key}
+                    label={item.label}
+                    onClick={item.onClick}
+                    onDelete={setData ? handleDelete(item) : undefined}
+                    className={chipStyle ? chipStyle : classes.chip}
+                    color={color}
+                />
+            )
+    })
 
-                if (item.label === 'React') {
-                    icon = <TagFacesIcon />;
-                }
-
-                return (
-                    <Chip
-                        key={item.key}
-                        icon={icon}
-                        label={item.label}
-                        onClick={item.onClick}
-                        onDelete={handleDelete(item)}
-                        className={classes.chip}
-                    />
-                );
-            })}
-        </Paper>
+    return ((onPaper) ?
+        <Paper className={classes.root}> {chips} </Paper> :
+        <Container> {chips} </Container>
     );
 }
+

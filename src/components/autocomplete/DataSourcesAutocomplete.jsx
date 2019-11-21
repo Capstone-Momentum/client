@@ -40,7 +40,7 @@ export default function DataSourcesAutocomplete(props) {
             setSuggestions(suggestions)
         }
         getDatasetItems()
-    }, [])
+    }, [setItems])
 
     return (
         <Autocomplete

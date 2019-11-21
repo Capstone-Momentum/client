@@ -1,6 +1,6 @@
 import React from 'react';
 import AppBar from './components/appbar/AppBar';
-import { LANDING, INTERACTIVE_MAP, INITATIVES, CUSTOMIZATION, TUTORIALS, CONTACT_US, ACCOUNT, EXPLORE } from './constants';
+import { LANDING, INTERACTIVE_MAP, INITATIVES, CUSTOMIZATION, TUTORIALS, CONTACT_US, ACCOUNT, EXPLORE, DATAVIEWER } from './constants';
 
 // Material UI's theming/styling solution 
 // (explained here: https://material-ui.com/customization/theming/ and here https://material-ui.com/styles/basics/)
@@ -24,6 +24,7 @@ import Tutorials from './containers/Tutorials';
 import ContactUs from './containers/ContactUs';
 import Account from './containers/Account';
 import Explore from './containers/Explore';
+import DataViewer from './containers/DataViewer';
 
 // Top level component
 function App() {
@@ -53,6 +54,11 @@ function App() {
       <Explore />
     </Route>
   )
+  const dataViewer = (
+    <Route path={DATAVIEWER}>
+      <DataViewer />
+    </Route>
+  )
   const tutorials = (
     <Route path={TUTORIALS}>
       <Tutorials />
@@ -79,6 +85,7 @@ function App() {
           {initiatives}
           {customization}
           {explore}
+          {dataViewer}
           {tutorials}
           {contactUs}
           {account}
