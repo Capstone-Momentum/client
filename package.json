@@ -6,13 +6,19 @@
     "@material-ui/core": "^4.6.1",
     "@material-ui/icons": "^4.5.1",
     "aws-sdk": "^2.574.0",
+    "chroma-js": "^2.1.0",
     "citysdk": "^2.0.37",
+    "dotenv": "^8.2.0",
+    "dotenv-webpack": "^1.7.0",
     "downshift": "^3.4.2",
+    "lodash": "^4.17.15",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-map-gl": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
-    "recharts": "^1.8.5"
+    "recharts": "^1.8.5",
+    "webpack": "^4.41.0"
   },
   "scripts": {
     "start": "react-scripts start",

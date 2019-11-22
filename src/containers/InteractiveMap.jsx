@@ -1,37 +1,34 @@
 import React from 'react';
-import { Link, Grid, List, ListItem, Typography } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import MapGL from '../mapping/MapGL';
 
 const useStyles = makeStyles({
     root: {
-        height: '20vh',
+        height: '90vh',
         padding: '0 4% 0 4%'
     }
 })
 
 export default function InteractiveMap() {
     const classes = useStyles()
+    const selection = 'B16008_041E'
 
     return (
         <Grid className={classes.root} container direction='column' alignItems='center' justify='center'>
-            <Typography variant='h5'> Potential Options: </Typography>
-            <List>
-                <ListItem>
-                    <Link href='https://uber.github.io/react-map-gl/#/Examples/dynamic-styling'>
-                        react-map-gl
-                </Link>
-                </ListItem>
-                <ListItem>
-                    <Link href='https://www.react-simple-maps.io/examples/'>
-                        react-simple-maps
-                </Link>
-                </ListItem>
-                <ListItem>
-                    <Link href='https://github.com/uscensusbureau/citysdk'>
-                        Census JavascriptSDK
-                </Link>
-                </ListItem>
-            </List>
+            <Grid item>
+                <MapGL vintage={2016} geoLevel="county subdivision" selection={selection} />
+            </Grid>
         </Grid>
     )
 }
+
+// All queriable variables https://api.census.gov/data/{vintage}/acs/{acs5 | acs1}/variables.json
+
+/*
+Potential geoLevels within the county:
+    tract
+    county subdivision
+    block group
+*/
+

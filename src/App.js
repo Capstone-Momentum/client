@@ -28,7 +28,6 @@ import DataViewer from './containers/DataViewer';
 
 // Top level component
 function App() {
-
   const landing = (
     <Route path={LANDING} exact>
       <Landing />
