@@ -64,7 +64,7 @@ export default function CensusMap(props) {
     }, [vintage])
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '90%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="body1">
                 {`${selection.concept}: ${selection.label.replace(/!!/g, ' ')}`}
             </Typography>
