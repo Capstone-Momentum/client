@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Autocomplete from './Autocomplete';
+import Autocomplete from './DownshiftAutocomplete';
 import { makeStyles } from '@material-ui/styles';
 import { scanTable } from '../../graphql/queries/explore/general';
 

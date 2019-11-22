@@ -24,19 +24,11 @@ export default function Explore() {
     const classes = useStyles()
     const [dataSource, setDataSource] = React.useState('')
     const [dataSourceObjs, setDataSourceObjs] = React.useState([])
-    // const [dataSourceTables, setDataSourceTables] = React.useState([])
     let history = useHistory()
 
     const getSelectedDataSourceObj = (dataSource) => {
         return dataSourceObjs.filter(obj => obj.name === dataSource)[0]
     }
-
-    // const setTablesForDataSource = (dataSource) => {
-    //     if (dataSource) {
-    //         const dataSourceObj = getSelectedDataSourceObj(dataSource)
-    //         setDataSourceTables(dataSourceObj.associated_tables.map(dst => ({ label: dst })))
-    //     }
-    // }
 
     return (
         <Grid className={classes.root} container direction='column' alignItems='center' justify='center' spacing={4}>
@@ -47,8 +39,7 @@ export default function Explore() {
                 <DataSourcesAutocomplete
                     selectedItem={dataSource}
                     setSelectedItem={setDataSource}
-                    setItems={setDataSourceObjs} // if you want all the items accessible in the parent
-                // onSelect={setTablesForDataSource}
+                    setItems={setDataSourceObjs}
                 />
             </Grid>
             {(dataSource && dataSource.length > 0) &&
@@ -79,23 +70,13 @@ export default function Explore() {
                                             pathname: '/data-viewer',
                                             state: { detail: { table: t } }
                                         })
-                                    }, // Default: scan entire table and display in a Table, however, special mappings can change this
+                                    },
                                 }))}
                             />
                         </CardContent>
                     </Card>
                 </Grid>
             }
-            {/* <Grid item>
-                <Autocomplete
-                    label={`${dataSource} Datasets`}
-                    placeholder={`Select a ${dataSource} Dataset...`}
-                    suggestions={dataSourceTables}
-                    onChange={table => setTable(table)}
-                    selectedItem={table}
-                    containerStyle={classes.autocomplete}
-                />
-            </Grid> */}
         </Grid>
     )
 }

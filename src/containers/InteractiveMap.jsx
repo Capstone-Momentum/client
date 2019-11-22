@@ -1,23 +1,21 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import MapGL from '../mapping/MapGL';
+import CensusMap from '../mapping/CensusMap';
 
 const useStyles = makeStyles({
     root: {
-        height: '90vh',
-        padding: '0 4% 0 4%'
+        padding: '1% 4% 0 4%'
     }
 })
 
 export default function InteractiveMap() {
     const classes = useStyles()
-    const selection = 'B16008_041E'
 
     return (
         <Grid className={classes.root} container direction='column' alignItems='center' justify='center'>
             <Grid item>
-                <MapGL vintage={2016} geoLevel="county subdivision" selection={selection} />
+                <CensusMap />
             </Grid>
         </Grid>
     )

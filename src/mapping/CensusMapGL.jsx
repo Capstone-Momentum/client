@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY } from '../constants';
 let chroma = require("chroma-js");
 const census = require('citysdk')
@@ -11,21 +12,22 @@ let _ = require("lodash");
 // Reference for adding onHover: https://github.com/uber/react-map-gl/blob/5.1-release/examples/geojson/src/app.js
 // Potential alternative free solution to mapping: https://www.react-simple-maps.io/examples/
 
-export default function MapGL(props) {
+export default function CensusMapGL(props) {
     const { vintage, geoLevel, selection, viewportDefault } = props
     const [data, setData] = React.useState({})
     const [layer, setLayer] = React.useState({})
     const [viewport, setViewport] = React.useState(
         viewportDefault ? viewportDefault : {
-            width: '80vw',
-            height: '80vh',
+            width: '65vw',
+            height: '65vh',
             latitude: SLO_LATITUDE,
             longitude: SLO_LONGITUDE,
             zoom: 8
         })
 
     useEffect(() => {
-        let quantiles = 10;
+        setData({})
+        let quantiles = 20;
         let colorScale = chroma.scale(["#ffffff", "#000000"]).domain([0, 1]);
 
         let censusPromise = function () {
@@ -89,7 +91,7 @@ export default function MapGL(props) {
                         property: selection,
                         stops: result.stops
                     },
-                    'fill-opacity': 0.8
+                    'fill-opacity': 0.6
                 }
             });
             setData(result.data)
@@ -109,6 +111,10 @@ export default function MapGL(props) {
                 <Layer {...layer} />
             </Source>
         </ReactMapGL>
-    ) : (<div />);
+    ) : (
+            <div style={{ width: viewport.width, height: viewport.height, backgroundColor: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CircularProgress />
+            </div>
+        );
 }
 
