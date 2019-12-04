@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY } from '../constants';
+import { makeStyles } from '@material-ui/styles';
+import { Card, CardContent, Typography, Grid } from '@material-ui/core';
+import { func } from 'prop-types';
 let chroma = require("chroma-js");
 const census = require('citysdk')
 let _ = require("lodash");
@@ -12,14 +15,34 @@ let _ = require("lodash");
 // Reference for adding onHover: https://github.com/uber/react-map-gl/blob/5.1-release/examples/geojson/src/app.js
 // Potential alternative free solution to mapping: https://www.react-simple-maps.io/examples/
 
+const useStyles = makeStyles({
+    card: {
+        backgroundColor: 'white'
+    },
+    tooltipText: {
+        textTransform: 'capitalize',
+        whiteSpace: 'nowrap',
+    }
+})
+
+const geoLevelToFeatureAttribute = {
+    'tract': 'tract',
+    'county subdivision': 'NAME',
+    'block group': 'block-group'
+}
+
 export default function CensusMapGL(props) {
     const { vintage, geoLevel, selection, viewportDefault } = props
+    const classes = useStyles()
     const [data, setData] = React.useState({})
+    const [hoveredLocation, setHoveredLocation] = React.useState(null)
+    const x = React.useRef(0)
+    const y = React.useRef(0)
     const [layer, setLayer] = React.useState({})
     const [viewport, setViewport] = React.useState(
         viewportDefault ? viewportDefault : {
-            width: '65vw',
-            height: '65vh',
+            width: '60vw',
+            height: '60vh',
             latitude: SLO_LATITUDE,
             longitude: SLO_LONGITUDE,
             zoom: 8
@@ -91,7 +114,7 @@ export default function CensusMapGL(props) {
                         property: selection,
                         stops: result.stops
                     },
-                    'fill-opacity': 0.6
+                    'fill-opacity': 0.7
                 }
             });
             setData(result.data)
@@ -101,15 +124,47 @@ export default function CensusMapGL(props) {
 
     }, [geoLevel, vintage, selection])
 
+    const _onHover = event => {
+        const {
+            features,
+            srcEvent: { offsetX, offsetY }
+        } = event;
+        console.log(features)
+        const hoveredLocation = features && features.find(f => f.layer.id === 'data');
+        x.current = offsetX > 0 ? offsetX : x
+        y.current = offsetY > 0 ? offsetY : y
+        setHoveredLocation(hoveredLocation)
+    };
+
+    const _renderTooltip = () => {
+        console.log(x)
+        console.log(y)
+        return (
+            hoveredLocation && (
+                <div className="tooltip" style={{ left: x.current, top: y.current, zIndex: 999, pointerEvents: 'none', position: 'absolute' }}>
+                    <Card className={classes.card}>
+                        <CardContent>
+                            <Typography className={classes.tooltipText} variant='body1'>
+                                {`${getHoveredName(hoveredLocation, geoLevel)}: ${addCommas(hoveredLocation.properties[selection])}`}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </div>
+            )
+        );
+    }
+
     return (Object.keys(data).length > 0) ? (
         <ReactMapGL
             mapboxApiAccessToken={process.env.REACT_APP_TOKEN}
             {...viewport}
             onViewportChange={(viewport) => setViewport(viewport)}
+            onHover={_onHover}
         >
             <Source type="geojson" data={data}>
                 <Layer {...layer} />
             </Source>
+            {_renderTooltip()}
         </ReactMapGL>
     ) : (
             <div style={{ width: viewport.width, height: viewport.height, backgroundColor: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -118,3 +173,18 @@ export default function CensusMapGL(props) {
         );
 }
 
+function getHoveredName(hoveredLocation, geoLevel) {
+    const location = hoveredLocation.properties[geoLevelToFeatureAttribute[geoLevel]]
+    if (geoLevel === 'county subdivision') {
+        return location
+    } else if (geoLevel === 'tract') {
+        return `Tract (${location})`
+    } else if (geoLevel === 'block group') {
+        const tract = hoveredLocation.properties[geoLevelToFeatureAttribute['tract']]
+        return `Tract (${tract}) / Block Group (${location})`
+    }
+}
+
+function addCommas(x) {
+    return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''
+}

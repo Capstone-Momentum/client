@@ -2,10 +2,34 @@ import React, { useEffect } from 'react';
 import CensusMapGL from './CensusMapGL';
 import Autocomplete from '../components/autocomplete/Autocomplete';
 import VirtualizedAutocomplete from '../components/autocomplete/VirtualizedAutocomplete'
-import { Typography } from '@material-ui/core';
+import { Typography, CardContent, Card, Divider, Grid, Container, Button } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 
-// TODOS:
-// - search functionality for the selection (variable)
+const useStyles = makeStyles(theme => ({
+    root: {
+        padding: '2%'
+    },
+    cardContent: {
+        height: '100%'
+    },
+    outerGridColumn: {
+        height: '100%',
+        padding: '4% 0 4% 0'
+    },
+    innerGridColumn: {
+        width: '95%'
+    },
+    sidebar: {
+        padding: '2%',
+        height: '100%'
+    },
+    lowercaseTypography: {
+        textTransform: 'lowercase'
+    },
+    button: {
+        color: '#2195F2'
+    }
+}))
 
 const availableVintages = [
     { vintage: "2010" },
@@ -40,11 +64,11 @@ export default function CensusMap(props) {
     const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'county subdivision' })
     const [selection, setSelection] = React.useState(defaultSelection)
     const [selections, setSelections] = React.useState(defaultSelections)
+    const classes = useStyles()
 
     useEffect(() => {
         const getSelectionOptions = async () => {
             const selectionsForVintageURL = `https://api.census.gov/data/${vintage.vintage}/acs/acs5/variables.json`
-            console.log(selectionsForVintageURL)
             const response = await fetch(selectionsForVintageURL, { method: 'GET' })
             let selectionsForVintage = await response.json()
             selectionsForVintage = selectionsForVintage.variables
@@ -63,44 +87,131 @@ export default function CensusMap(props) {
         getSelectionOptions()
     }, [vintage])
 
+    const sidebar = (
+        <Card className={classes.sidebar} elevation={4}>
+            <CardContent className={classes.cardContent}>
+                <Grid className={classes.outerGridColumn} container direction='column' justify='space-between'>
+                    <Grid className={classes.innerGridColumn} item container direction='column' spacing={2}>
+                        <Grid item>
+                            <Typography variant='h5'>
+                                Interact with the Map
+                        </Typography>
+                        </Grid>
+                        <Grid item>
+                            <Divider />
+                        </Grid>
+                        <Grid item container direction='row' justify='space-between'>
+                            <Grid item>
+                                <Autocomplete
+                                    label='Vintage'
+                                    value={vintage}
+                                    onChange={(e, v) => setVintage(v)}
+                                    options={availableVintages}
+                                    optionLabelAttr='vintage'
+                                    disableClearable
+                                />
+                            </Grid>
+                            <Grid item>
+                                <Button className={classes.button} size='small'>
+                                    Help?
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid item>
+                            <Autocomplete
+                                label='Geography Level'
+                                value={geoLevel}
+                                onChange={(e, v) => setGeoLevel(v)}
+                                options={availableGeoLevels}
+                                optionLabelAttr='geoLevel'
+                                disableClearable
+                            />
+                        </Grid>
+                        <Grid item>
+                            <VirtualizedAutocomplete
+                                label='Selection'
+                                value={selection}
+                                onChange={(e, v) => setSelection(v)}
+                                options={selections}
+                                getOptionLabel={option => {
+                                    return (option && option.concept && option.label) ? (option.concept + ': ' + option.label.replace(/!!/g, ' ')) : ''
+                                }}
+                                disableClearable
+                                style={{ width: '100%', paddingBottom: '1vh' }}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid item container direction='row' justify='space-between' wrap='nowrap'>
+                        <Grid item container direction='row' spacing={2}>
+                            <Grid item>
+                                <Button className={classes.button}>
+                                    Undo
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button className={classes.button}>
+                                    Clear
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid item container direction='row' spacing={2} justify='flex-end'>
+                            <Grid item>
+                                <Button className={classes.button}>
+                                    Share
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button className={classes.button}>
+                                    Export
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </CardContent>
+        </Card>
+    )
+
+    const labeledMap = (
+        <Grid item container direction='column' xs={8} spacing={2}>
+            <Grid item>
+                <Container className={classes.container}>
+                    <CensusMapGL vintage={vintage.vintage} geoLevel={geoLevel.geoLevel} selection={selection.selection} />
+                </Container>
+            </Grid>
+            <Grid item>
+                <Card className={classes.card}>
+                    <CardContent>
+                        <Typography variant="h6">
+                            Concept <br />
+                        </Typography>
+                        <Typography className={classes.lowercaseTypography} variant="body1">
+                            {`${selection.concept}`}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid item>
+                <Card className={classes.card}>
+                    <CardContent>
+                        <Typography variant="h6">
+                            Label <br />
+                        </Typography>
+                        <Typography className={classes.lowercaseTypography} variant="body1">
+                            {`${selection.label.replace(/!!/g, ' ')}`}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+    )
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="body1">
-                {`${selection.concept}: ${selection.label.replace(/!!/g, ' ')}`}
-            </Typography>
-            <div style={{ height: '1vh' }} />
-            <CensusMapGL vintage={vintage.vintage} geoLevel={geoLevel.geoLevel} selection={selection.selection} />
-            <div style={{ height: '1vh' }} />
-            <VirtualizedAutocomplete
-                label='Selection'
-                value={selection}
-                onChange={(e, v) => setSelection(v)}
-                options={selections}
-                getOptionLabel={option => {
-                    return (option && option.concept && option.label) ? (option.concept + ': ' + option.label.replace(/!!/g, ' ')) : ''
-                }}
-                disableClearable
-                style={{ width: '100%', paddingBottom: '1vh' }}
-            />
-            <div style={{ display: 'flex', flexDirection: 'row', padding: '2%', width: '70vw', justifyContent: 'center' }}>
-                <Autocomplete
-                    label='Vintage'
-                    value={vintage}
-                    onChange={(e, v) => setVintage(v)}
-                    options={availableVintages}
-                    optionLabelAttr='vintage'
-                    disableClearable
-                />
-                <div style={{ width: '1vw' }} />
-                <Autocomplete
-                    label='Geography Level'
-                    value={geoLevel}
-                    onChange={(e, v) => setGeoLevel(v)}
-                    options={availableGeoLevels}
-                    optionLabelAttr='geoLevel'
-                    disableClearable
-                />
-            </div>
-        </div>
+        <Grid className={classes.root} container direction='row' spacing={4}>
+            <Grid item xs={4}>
+                {sidebar}
+            </Grid>
+            {labeledMap}
+        </Grid>
     )
 }
