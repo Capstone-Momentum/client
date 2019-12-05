@@ -3,8 +3,7 @@ import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY } from '../constants';
 import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Typography, Grid } from '@material-ui/core';
-import { func } from 'prop-types';
+import { Card, CardContent, Typography } from '@material-ui/core';
 let chroma = require("chroma-js");
 const census = require('citysdk')
 let _ = require("lodash");
@@ -51,7 +50,7 @@ export default function CensusMapGL(props) {
     useEffect(() => {
         setData({})
         let quantiles = 20;
-        let colorScale = chroma.scale(["#ffffff", "#000000"]).domain([0, 1]);
+        let colorScale = chroma.scale(['white', 'green']).domain([0, 1]);
 
         let censusPromise = function () {
             return new Promise(function (resolve, reject) {
