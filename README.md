@@ -17,6 +17,14 @@ Install Node Package Manager via https://nodejs.org/en/download/.
 
 Run `npm i` to ensure that your machine is up-to-date with the correct versions of required packages.
 
+### Set up Mapbox
+
+Create an account at https://account.mapbox.com/.
+
+Navigate to the bottom of the page, find the Access Tokens section, and copy the Default Public Token.
+
+Create a file called ".env" at the root level of this directory, containing the line `REACT_APP_TOKEN=<your_default_public_token_here>`.
+
 ## Available Scripts
 
 In the project directory, you can run:
