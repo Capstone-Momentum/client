@@ -172,7 +172,7 @@ export default function CensusMapGL(props) {
         );
 }
 
-function getHoveredName(hoveredLocation, geoLevel) {
+export function getHoveredName(hoveredLocation, geoLevel) {
     const location = hoveredLocation.properties[geoLevelToFeatureAttribute[geoLevel]]
     if (geoLevel === 'county subdivision') {
         return location
@@ -184,6 +184,6 @@ function getHoveredName(hoveredLocation, geoLevel) {
     }
 }
 
-function addCommas(x) {
+export function addCommas(x) {
     return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''
 }
