@@ -26,6 +26,7 @@ export default class SimpleLineChart extends PureComponent {
     }
 }
 
+
 // Example Usage:
 export const mockData = [
     {

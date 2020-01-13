@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Typography, makeStyles } from '@material-ui/core';
-import { SimpleLineChartExample } from '../charts/line/SimpleLineChart';
+import CensusBarChart from '../charts/line/BarChart';
 
 const useStyles = makeStyles({
     column: {
@@ -33,7 +33,7 @@ export default function Landing() {
             </Grid>
             <Grid item xs={6} container className={classes.column} direction='column' alignItems='center' justify='center' spacing={4}>
                 <Grid item>
-                    <SimpleLineChartExample />
+                    <CensusBarChart />
                 </Grid>
             </Grid>
         </Grid>
