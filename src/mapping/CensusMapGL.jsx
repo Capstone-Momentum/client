@@ -24,12 +24,6 @@ const useStyles = makeStyles({
     }
 })
 
-const geoLevelToFeatureAttribute = {
-    'tract': 'tract',
-    'county subdivision': 'NAME',
-    'block group': 'block-group'
-}
-
 export default function CensusMapGL(props) {
     const { vintage, geoLevel, selection, viewportDefault } = props
     const classes = useStyles()
@@ -172,8 +166,16 @@ export default function CensusMapGL(props) {
         );
 }
 
+
+const geoLevelToFeatureAttribute = {
+    'tract': 'tract',
+    'county subdivision': 'NAME',
+    'block group': 'block-group'
+}
+
 export function getHoveredName(hoveredLocation, geoLevel) {
-    const location = hoveredLocation.properties[geoLevelToFeatureAttribute[geoLevel]]
+    const geoLevelProperty = geoLevelToFeatureAttribute[geoLevel]
+    const location = hoveredLocation.properties[geoLevelProperty]
     if (geoLevel === 'county subdivision') {
         return location
     } else if (geoLevel === 'tract') {
