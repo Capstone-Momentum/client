@@ -9,8 +9,8 @@ phases:
       - npm install
   build:
     commands:
-      - echo Build started on `date`
-      - npm run build
+      - echo Testing...
+      - npm run test
 
 artifacts:
   files:
