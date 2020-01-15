@@ -1,83 +1,81 @@
-import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY 
-} from '../../constants';
-import React, { PureComponent } from 'react';
 import {
-  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    CALIFORNIA_CODE, CENSUS_KEY, CCSR_COUNTIES
+} from '../../constants';
+import React from 'react';
+import {
+    BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label
 } from 'recharts';
+import { useEffect } from 'react';
 const census = require('citysdk')
 
-// export default class SimpleBarChart extends PureComponent {
-//   static jsfiddleUrl = 'https://jsfiddle.net/alidingling/30763kr7/';
-//   constructor(props) {
-//     super(props)
-//     //     const selection = {
-//     //         "selection": "B19013_001E",
-//     //         "label": "Estimate!!Median household income in the past 12 months (in 2018 inflation-adjusted dollars)",
-//     //         "concept": "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATION-ADJUSTED DOLLARS)",
-//     //         "predicateType": "int",
-//     //         "group": "B19013",
-//     //         "limit": 0,
-//     //         "attributes": "B19013_001M,B19013_001MA,B19013_001EA"
-//     //         }
-
-//     // const data = census({
-//     //     "vintage" : "2018",
-//     //     "geoHierarchy" : {
-//     //         "state": CALIFORNIA_CODE,
-//     //         "county": SLO_COUNTY_CODE,
-//     //     },
-//     //     "sourcePath" : ["acs", "acs1"],  
-//     //     "values" : [selection],
-//     //     "statsKey" : CENSUS_KEY
-//     //     }, 
-//     //     (err, res) => console.log(res)
-//     //     )
-//     //     console.log(data)
-//     }
-//   // we want to use B19013_001E (Median household income in the past 12 months)
-// }
+export function getAPICall() {
+    return {
+        "vintage": "2018",
+        "geoHierarchy": {
+            "state": CALIFORNIA_CODE,
+            "county": CCSR_COUNTIES
+        },
+        "sourcePath": ["acs", "acs1"],
+        "values": ["B19013_001E", "NAME"],
+        "statsKey": CENSUS_KEY
+    };
+}
 
 export default function CensusBarChart() {
     const [data, setData] = React.useState({})
-    let censusPromise = function (){
-        return new Promise(function (resolve, reject){
-            census({
-                "vintage" : "2018",
-                "geoHierarchy" : {
-                    "state": CALIFORNIA_CODE,
-                    "county": "*",
-                },
-                "sourcePath" : ["acs", "acs1"],  
-                "values" : ["B19013_001E"],
-                "statsKey" : CENSUS_KEY
-            },
-            (err, res) => {
-                if (!err){
-                    resolve(res);
-                } 
-                else{ reject(err); }})})}
-    let getCensusData = async function () {
-        let censusJSON = await censusPromise();
-        return { data: censusJSON };}
-    const retrieveData = async () => {
-        const result = await getCensusData();
-        setData(result.data);
-    }
-    retrieveData();
-        return (
-            <BarChart
-            width={500}
-            height={300}
-            data={data}
-            margin={{top: 5, right: 30, left: 20, bottom: 5,}}
-            >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="county" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="county" fill="#8884d8" />
-            <Bar dataKey="B19013_001E" fill="#8884d8" />
-            </BarChart>
-        );
-    }
+    useEffect(() => {
+        let censusPromise = function () {
+            return new Promise(function (resolve, reject) {
+                census(getAPICall(),
+                    (err, res) => {
+                        if (!err) {
+                            console.log(res);
+                            resolve(res);
+                        }
+                        else { reject(err); }
+                    })
+            })
+        }
+
+        const retrieveData = async () => {
+            const result = await censusPromise();
+            setData(result);
+        }
+        retrieveData();
+
+    }, [])
+
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload) {
+            return (
+                <div className="custom-tooltip">
+                    <p className="label">{`Median Household Income: ${payload[0].value}`}</p>
+                    <p className="desc">{`County: ${label}`}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    return (
+        <div className="median income bar chart">
+            <h6 align="center">
+                Median Household Income per Central Coast County, 2018
+            </h6>
+            <ResponsiveContainer width="100%" height={600}>
+                <BarChart cx="50%" cy="50%" outerRadius="80%"
+                    data={data}
+                    margin={{ top: 10, right: 10, left: 30, bottom: 30 }}           >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="NAME" >
+                        <Label value="County" offset={0} position="bottom" />
+                    </XAxis>
+                    <YAxis label={{ value: 'Median Household Income', angle: -90, position: "left", textAnchor: "middle" }} />
+                    <Tooltip filterNull={false} content={<CustomTooltip />} />
+                    <Bar dataKey="B19013_001E" fill="#8884d8" />
+                </BarChart>
+            </ResponsiveContainer>
+        </div>
+
+    );
+}
