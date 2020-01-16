@@ -28,7 +28,6 @@ describe("CensusMapGL - Unit Tests", () => {
                     .toBe(expected)
             })
         }
-        done();
     })
 
     describe('addCommas', () => {
@@ -60,7 +59,6 @@ describe("CensusMapGL - Unit Tests", () => {
                 expect(addCommas(num)).toBe(expected);
             })
         }
-        done();
     })
 })
 

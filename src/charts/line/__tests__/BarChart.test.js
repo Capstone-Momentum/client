@@ -16,6 +16,5 @@ describe("bar graph tests", () => {
             "statsKey": CENSUS_KEY
         };
         expect(getAPICall()).toStrictEqual(expected);
-        done();
     })
 })
