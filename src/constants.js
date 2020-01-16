@@ -22,3 +22,4 @@ export const CALIFORNIA_CODE = '06'
 export const SLO_COUNTY_CODE = '079'
 export const SLO_LATITUDE = 35.2828
 export const SLO_LONGITUDE = -120.6596
+export const CCSR_COUNTIES = "079, 083, 053"
