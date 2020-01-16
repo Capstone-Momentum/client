@@ -4,6 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY } from '../constants';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Typography } from '@material-ui/core';
+import color from '@material-ui/core/colors/yellow';
 let chroma = require("chroma-js");
 const census = require('citysdk')
 let _ = require("lodash");
@@ -24,15 +25,9 @@ const useStyles = makeStyles({
     }
 })
 
-const geoLevelToFeatureAttribute = {
-    'tract': 'tract',
-    'county subdivision': 'NAME',
-    'block group': 'block-group'
-}
-
 export default function CensusMapGL(props) {
-    const { vintage, geoLevel, selection, viewportDefault } = props
     const classes = useStyles()
+    const { vintage, geoLevel, selection, viewportDefault, quantiles, colorScale } = props
     const [data, setData] = React.useState({})
     const [hoveredLocation, setHoveredLocation] = React.useState(null)
     const x = React.useRef(0)
@@ -49,9 +44,6 @@ export default function CensusMapGL(props) {
 
     useEffect(() => {
         setData({})
-        let quantiles = 20;
-        let colorScale = chroma.scale(['white', 'green']).domain([0, 1]);
-
         let censusPromise = function () {
             return new Promise(function (resolve, reject) {
                 const geoHierarchy = {
@@ -76,18 +68,6 @@ export default function CensusMapGL(props) {
             });
         };
 
-        let quantileMaker = function (min, max) {
-            let diff = max - min;
-            let bucket = diff / quantiles;
-            let dataScale = Array.apply(null, { length: quantiles })
-                .map(Number.prototype.valueOf, 0)
-                .map(function (val, idx) { return idx === 0 ? min : (this.acc += bucket) }, { acc: min });
-            let normalScale = dataScale
-                .map(function (val, idx) { return idx === 0 ? Math.round((min + 1 / max) * 100) / 100 : val / max });
-            let chromaScale = normalScale.map(function (val) { return colorScale(val).hex() });
-            return _.zip(dataScale, chromaScale);
-        };
-
         let getCensusData = async function () {
             let censusGeoJSON = await censusPromise();
             let features = censusGeoJSON.features;
@@ -99,7 +79,9 @@ export default function CensusMapGL(props) {
                 return o.properties[selection];
             });
             let minVal = minStat.properties[selection];
-            let scale = quantileMaker(minVal, maxVal);
+            const quantiles_ = quantiles ? quantiles : 20;
+            const colorScale_ = colorScale ? colorScale : chroma.scale(['white', 'green']).domain([0, 1]);
+            let scale = quantileMaker(colorScale_, quantiles_, minVal, maxVal);
             return { data: censusGeoJSON, stops: scale };
         };
 
@@ -121,19 +103,7 @@ export default function CensusMapGL(props) {
 
         retrieveMapData()
 
-    }, [geoLevel, vintage, selection])
-
-    const _onHover = event => {
-        const {
-            features,
-            srcEvent: { offsetX, offsetY }
-        } = event;
-        console.log(features)
-        const hoveredLocation = features && features.find(f => f.layer.id === 'data');
-        x.current = offsetX > 0 ? offsetX : x
-        y.current = offsetY > 0 ? offsetY : y
-        setHoveredLocation(hoveredLocation)
-    };
+    }, [geoLevel, quantiles, colorScale, vintage, selection])
 
     const _renderTooltip = () => {
         console.log(x)
@@ -152,6 +122,8 @@ export default function CensusMapGL(props) {
             )
         );
     }
+
+    const _onHover = event => onHover(setHoveredLocation, event, x, y)
 
     return (Object.keys(data).length > 0) ? (
         <ReactMapGL
@@ -172,8 +144,38 @@ export default function CensusMapGL(props) {
         );
 }
 
-function getHoveredName(hoveredLocation, geoLevel) {
-    const location = hoveredLocation.properties[geoLevelToFeatureAttribute[geoLevel]]
+const onHover = (setHoveredLocation, event, x, y) => {
+    const {
+        features,
+        srcEvent: { offsetX, offsetY }
+    } = event;
+    const hoveredLocation = features && features.find(f => f.layer.id === 'data');
+    x.current = offsetX > 0 ? offsetX : x
+    y.current = offsetY > 0 ? offsetY : y
+    setHoveredLocation(hoveredLocation)
+};
+
+let quantileMaker = function (colorScale, quantiles, min, max) {
+    let diff = max - min;
+    let bucket = diff / quantiles;
+    let dataScale = Array.apply(null, { length: quantiles })
+        .map(Number.prototype.valueOf, 0)
+        .map(function (val, idx) { return idx === 0 ? min : (this.acc += bucket) }, { acc: min });
+    let normalScale = dataScale
+        .map(function (val, idx) { return idx === 0 ? Math.round((min + 1 / max) * 100) / 100 : val / max });
+    let chromaScale = normalScale.map(function (val) { return colorScale(val).hex() });
+    return _.zip(dataScale, chromaScale);
+};
+
+const geoLevelToFeatureAttribute = {
+    'tract': 'tract',
+    'county subdivision': 'NAME',
+    'block group': 'block-group'
+}
+
+export function getHoveredName(hoveredLocation, geoLevel) {
+    const geoLevelProperty = geoLevelToFeatureAttribute[geoLevel]
+    const location = hoveredLocation.properties[geoLevelProperty]
     if (geoLevel === 'county subdivision') {
         return location
     } else if (geoLevel === 'tract') {
@@ -184,6 +186,6 @@ function getHoveredName(hoveredLocation, geoLevel) {
     }
 }
 
-function addCommas(x) {
+export function addCommas(x) {
     return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''
 }
