@@ -9,11 +9,11 @@ import { useEffect } from 'react';
 const census = require('citysdk')
 
 const geoLevelToSelection = {
-    'county': {'county': CCSR_COUNTIES},
-    'tract': {'tract': CCSR_TRACTS},
-    'county subdivision': {'county-subdivision': CCSR_SUBDIVS},
-    'block group': {'block group': CCSR_BLOCKS},
-    'zip code tabulation area': {'zip code tabulation area': CCSR_ZIPS}
+    'county': { 'county': CCSR_COUNTIES },
+    'tract': { 'tract': CCSR_TRACTS },
+    'county subdivision': { 'county-subdivision': CCSR_SUBDIVS },
+    'block group': { 'block group': CCSR_BLOCKS },
+    'zip code tabulation area': { 'zip code tabulation area': CCSR_ZIPS }
 }
 
 const geoLevelToFeatureAttribute = {
@@ -83,8 +83,8 @@ export default function CensusBarChart() {
                 opacity: '0.9',
                 border: '1px solid black',
                 borderRadius: '15px',
-                paddingLeft:'10px',
-                paddingRight:'10px'
+                paddingLeft: '10px',
+                paddingRight: '10px'
             }
             return (
                 <div className="custom-tooltip" style={tooltip} >
