@@ -40,7 +40,7 @@ const concept = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATIO
 const formatConcept = concept.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
 
 //get the cities corresponding with the given zip
-export function correspondingCities(zip){
+export function correspondingCities(zip) {
     let result = Object.keys(CCSR_CITY_ZIPS).filter(key => CCSR_CITY_ZIPS[key].includes(zip))
     return result.join(', ');
 }
@@ -57,6 +57,29 @@ export function getAPICall(year, geoLevel, dataset, concept) {
     };
 }
 
+// tooltip custom text and background
+export const CustomToolTip = ({ active, payload, label }) => {
+    console.log(active);
+    console.log(payload);
+    if (active && payload) {
+        const tooltip = {
+            backgroundColor: 'white',
+            opacity: '0.9',
+            border: '1px solid black',
+            borderRadius: '15px',
+            paddingLeft: '10px',
+            paddingRight: '10px'
+        }
+        return (
+            <div className="custom-tooltip" style={tooltip} >
+                <p className="label">{`${formatConcept}: ${payload[0].value}`}</p>
+                <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label} (${correspondingCities(label)})`}</p>
+            </div>
+        );
+    }
+    return null;
+};
+
 export default function CensusBarChart() {
     const [data, setData] = React.useState({})
     useEffect(() => {
@@ -66,7 +89,6 @@ export default function CensusBarChart() {
                 census(getAPICall(year, geoLevel, dataset, concept),
                     (err, res) => {
                         if (!err) {
-                            console.log(res);
                             resolve(res);
                         }
                         else { reject(err); }
@@ -80,27 +102,6 @@ export default function CensusBarChart() {
         }
         retrieveData();
     }, [])
-
-    // tooltip custom text and background
-    const CustomToolTip = ({ active, payload, label }) => {
-        if (active && payload) {
-            const tooltip = {
-                backgroundColor: 'white',
-                opacity: '0.9',
-                border: '1px solid black',
-                borderRadius: '15px',
-                paddingLeft: '10px',
-                paddingRight: '10px'
-            }
-            return (
-                <div className="custom-tooltip" style={tooltip} >
-                    <p className="label">{`${formatConcept}: ${payload[0].value}`}</p>
-                    <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label} (${correspondingCities(label)})`}</p>
-                </div>
-            );
-        }
-        return null;
-    };
 
     return (
         <div className="bar chart">

@@ -1,4 +1,4 @@
-import CensusBarChart, { getAPICall } from '../BarChart';
+import CensusBarChart, { getAPICall, CustomToolTip } from '../BarChart';
 import {
     CALIFORNIA_CODE, CENSUS_KEY, CCSR_COUNTIES, CCSR_ZIPS
 } from '../../../constants';
@@ -30,5 +30,10 @@ describe("bar graph tests", () => {
         const p = wrapper.find('div');
         expect(p.hasClass("bar chart")).toBe(true);
     });
+
+    test('returns correct tooltip', () => {
+        const tooltip = CustomToolTip(false, false, "income");
+        expect(tooltip).toBe(null);
+    })
 
 })
