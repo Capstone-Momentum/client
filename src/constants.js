@@ -25,7 +25,7 @@ export const SLO_LONGITUDE = -120.6596
 export const CCSR_COUNTIES = "079, 083, 053"
 // ideally I want to be able to attribute the zip codes to the cities they are in
 // 93410 is broken for some reason..
-export const CSSR_CITY_ZIPS = {
+export const CCSR_CITY_ZIPS = {
     "Paso Robles" :  "93446, 93447",
     "Atascadero" :  "93422, 93423",
     "San Luis Obispo" : "93401, 93403, 93405, 93406, 93408",
@@ -49,8 +49,8 @@ export const CSSR_CITY_ZIPS = {
     "Orcutt" : "93455, 93457",
     "Sant Ynez" : "93460, 93463",
     "Vandenberg Village" : "93436"}
-export const CSSR_CITIES = Object.keys(CSSR_CITY_ZIPS).join(', ');
-export const CCSR_ZIPS = Object.values(CSSR_CITY_ZIPS).join(', ');
+export const CCSR_CITIES = Object.keys(CCSR_CITY_ZIPS).join(', ');
+export const CCSR_ZIPS = Object.values(CCSR_CITY_ZIPS).join(', ');
 // not sure if we will need this...
 export const CCSR_SUBDIVS = ''
 export const CCSR_TRACTS = '' 

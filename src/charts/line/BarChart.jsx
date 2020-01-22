@@ -1,5 +1,5 @@
 import {
-    CENSUS_KEY, CCSR_COUNTIES, CSSR_CITY_ZIPS, CSSR_CITIES, CCSR_ZIPS, CCSR_SUBDIVS, CCSR_TRACTS, CCSR_BLOCKS
+    CENSUS_KEY, CCSR_COUNTIES, CCSR_CITY_ZIPS, CCSR_CITIES, CCSR_ZIPS, CCSR_SUBDIVS, CCSR_TRACTS, CCSR_BLOCKS
 } from '../../constants';
 import React from 'react';
 import {
@@ -38,6 +38,12 @@ const geoLevel = "zip code tabulation area"
 const dataset = "B19013_001E"
 const concept = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATION-ADJUSTED DOLLARS)"
 const formatConcept = concept.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+
+//get the cities corresponding with the given zip
+export function correspondingCities(zip){
+    let result = Object.keys(CCSR_CITY_ZIPS).filter(key => CCSR_CITY_ZIPS[key].includes(zip))
+    return result.join(', ');
+}
 
 export function getAPICall(year, geoLevel, dataset, concept) {
     const geoSelection = geoLevelToSelection[geoLevel]
@@ -89,7 +95,7 @@ export default function CensusBarChart() {
             return (
                 <div className="custom-tooltip" style={tooltip} >
                     <p className="label">{`${formatConcept}: ${payload[0].value}`}</p>
-                    <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label}`}</p>
+                    <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label} (${correspondingCities(label)})`}</p>
                 </div>
             );
         }
