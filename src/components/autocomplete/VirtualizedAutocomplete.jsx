@@ -11,8 +11,14 @@ function renderRow(props) {
 
     return React.cloneElement(data[index], {
         style: {
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            // Causes the ellipses and removed text.
+            //overflow: 'hidden',
+            //textOverflow: 'ellipsis',
+
+            // Might be able to play with whitespace here to adjust block and get wrapping.
+            //flex: 1,
+            //flexWrap: 'wrap',
+
             whiteSpace: 'nowrap',
             display: 'block',
             ...style,

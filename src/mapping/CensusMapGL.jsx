@@ -31,7 +31,7 @@ const geoLevelToFeatureAttribute = {
 }
 
 export default function CensusMapGL(props) {
-    const { vintage, geoLevel, selection, viewportDefault } = props
+    const { vintage, geoLevel, gender, selection, viewportDefault } = props
     const classes = useStyles()
     const [data, setData] = React.useState({})
     const [hoveredLocation, setHoveredLocation] = React.useState(null)

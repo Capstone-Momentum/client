@@ -47,10 +47,17 @@ const availableGeoLevels = [
     { geoLevel: 'block group' },
 ]
 
+const genders = [
+    {gender: 'None'},
+    {gender: 'Male'},
+    {gender: 'Female'},
+]
+
 const defaultSelection = {
     "selection": "B20005_028E",
     "label": "Estimate!!Total!!Male!!Other!!With earnings",
     "concept": "SEX BY WORK EXPERIENCE IN THE PAST 12 MONTHS BY EARNINGS IN THE PAST 12 MONTHS (IN 2017 INFLATION-ADJUSTED DOLLARS) FOR THE POPULATION 16 YEARS AND OVER",
+    "gender": "None",
     "predicateType": "int",
     "group": "B20005",
     "limit": 0,
@@ -62,6 +69,7 @@ const defaultSelections = [defaultSelection]
 export default function CensusMap(props) {
     const [vintage, setVintage] = React.useState({ vintage: "2016" })
     const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'county subdivision' })
+    const [gender, setGender] = React.useState({ gender: 'None' })
     const [selection, setSelection] = React.useState(defaultSelection)
     const [selections, setSelections] = React.useState(defaultSelections)
     const classes = useStyles()
@@ -73,6 +81,8 @@ export default function CensusMap(props) {
             let selectionsForVintage = await response.json()
             selectionsForVintage = selectionsForVintage.variables
             const selectionsForVintageFlattened = []
+
+            // Use materialUI or Javascript filtering
             Object.keys(selectionsForVintage).forEach(sKey => {
                 selectionsForVintageFlattened.push(
                     {
@@ -81,11 +91,12 @@ export default function CensusMap(props) {
                     }
                 )
             })
+
             setSelections(selectionsForVintageFlattened)
             setSelection(selectionsForVintageFlattened[3])
         }
         getSelectionOptions()
-    }, [vintage])
+    }, [vintage, gender])
 
     const sidebar = (
         <Card className={classes.sidebar} elevation={4}>
@@ -124,6 +135,16 @@ export default function CensusMap(props) {
                                 onChange={(e, v) => setGeoLevel(v)}
                                 options={availableGeoLevels}
                                 optionLabelAttr='geoLevel'
+                                disableClearable
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Autocomplete
+                                label='Gender'
+                                value={gender}
+                                onChange={(e, v) => setGender(v)}
+                                options={genders}
+                                optionLabelAttr='gender'
                                 disableClearable
                             />
                         </Grid>
