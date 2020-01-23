@@ -58,9 +58,7 @@ export function getAPICall(year, geoLevel, dataset, concept) {
 }
 
 // tooltip custom text and background
-export const CustomToolTip = ({ active, payload, label }) => {
-    console.log(active);
-    console.log(payload);
+export function CustomToolTip({ active, payload, label }) {
     if (active && payload) {
         const tooltip = {
             backgroundColor: 'white',

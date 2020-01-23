@@ -2,6 +2,7 @@ import CensusBarChart, { getAPICall, CustomToolTip } from '../BarChart';
 import {
     CALIFORNIA_CODE, CENSUS_KEY, CCSR_COUNTIES, CCSR_ZIPS
 } from '../../../constants';
+import { Tooltip } from 'recharts';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { mount } from 'enzyme';
@@ -31,9 +32,19 @@ describe("bar graph tests", () => {
         expect(p.hasClass("bar chart")).toBe(true);
     });
 
-    test('returns correct tooltip', () => {
+    test('tooltip returns null if given false data', () => {
         const tooltip = CustomToolTip(false, false, "income");
         expect(tooltip).toBe(null);
-    })
+    });
+
+    test('tooltip returns correct component', () => {
+        const tooltip = CustomToolTip(true, 50000, "income");
+        //const wrapper = shallow(<tooltip />);
+        //console.log(wrapper.getElement());
+        const wrapper = shallow(<Tooltip filterNull={false} content={tooltip} />);
+        //console.log(wrapper2.find('content').hasClass('label'));
+        const p = wrapper.find('div');
+        expect(p.hasClass("recharts-tooltip-wrapper")).toBe(true);
+    });
 
 })
