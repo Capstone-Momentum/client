@@ -80,18 +80,38 @@ export default function CensusMap(props) {
             const response = await fetch(selectionsForVintageURL, { method: 'GET' })
             let selectionsForVintage = await response.json()
             selectionsForVintage = selectionsForVintage.variables
-            const selectionsForVintageFlattened = []
+            let selectionsForVintageFlattened = []
 
             // Use materialUI or Javascript filtering
-            Object.keys(selectionsForVintage).forEach(sKey => {
-                selectionsForVintageFlattened.push(
-                    {
-                        selection: sKey,
-                        ...selectionsForVintage[sKey]
+            if (gender.gender.indexOf('None') !== -1) {
+                Object.keys(selectionsForVintage).forEach(sKey => {
+                    selectionsForVintageFlattened.push(
+                        {
+                            selection: sKey,
+                            ...selectionsForVintage[sKey]
+                        }
+                    )
+                })
+            } 
+            else {
+                Object.keys(selectionsForVintage).forEach(sKey => {
+                    if (typeof(selectionsForVintage[sKey].label) != "string" || 
+                    typeof(selectionsForVintage[sKey].concept) != "string") {
+                        ;
                     }
-                )
-            })
+                    else if (selectionsForVintage[sKey].label.indexOf(gender.gender) !== -1 || 
+                    selectionsForVintage[sKey].concept.indexOf(gender.gender) !== -1) {
+                        selectionsForVintageFlattened.push(
+                            {
+                                selection: sKey,
+                                ...selectionsForVintage[sKey]
+                            }
+                        )
+                    }
 
+                })
+            }
+            
             setSelections(selectionsForVintageFlattened)
             setSelection(selectionsForVintageFlattened[3])
         }
