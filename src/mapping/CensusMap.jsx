@@ -52,7 +52,7 @@ const availableVintages = [
 
 const availableGeoLevels = [
     { geoLevel: 'zip code tabulation area' },
-    { geoLevel: 'count' },
+    { geoLevel: 'county' },
 ]
 
 const defaultSelection = {
