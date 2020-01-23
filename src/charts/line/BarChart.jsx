@@ -32,7 +32,7 @@ const geoLevelToTitle = {
     'zip code tabulation area': 'Zip Code Tabulation Area'
 }
 
-// median household income by zip code
+// default: median household income by zip code
 const year = "2018"
 const geoLevel = "zip code tabulation area"
 const dataset = "B19013_001E"
@@ -57,6 +57,11 @@ export function getAPICall(year, geoLevel, dataset, concept) {
     };
 }
 
+//add commas to values in tooltip for readability
+export function addCommas(x) {
+    return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''
+}
+
 // tooltip custom text and background
 export function CustomToolTip({ active, payload, label }) {
     if (active && payload) {
@@ -70,7 +75,7 @@ export function CustomToolTip({ active, payload, label }) {
         }
         return (
             <div className="custom-tooltip" style={tooltip} >
-                <p className="label">{`${formatConcept}: ${payload[0].value}`}</p>
+                <p className="label">{`${formatConcept}: ${addCommas(payload[0].value)}`}</p>
                 <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label} (${correspondingCities(label)})`}</p>
             </div>
         );
