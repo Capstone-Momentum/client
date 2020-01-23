@@ -45,6 +45,7 @@ const availableGeoLevels = [
     { geoLevel: 'tract' },
     { geoLevel: 'county subdivision' },
     { geoLevel: 'block group' },
+    { geoLevel: 'zip code tabulation area' },
 ]
 
 const defaultSelection = {

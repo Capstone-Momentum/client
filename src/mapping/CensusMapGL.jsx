@@ -4,7 +4,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY } from '../constants';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Typography } from '@material-ui/core';
-import color from '@material-ui/core/colors/yellow';
 let chroma = require("chroma-js");
 const census = require('citysdk')
 let _ = require("lodash");
@@ -106,8 +105,6 @@ export default function CensusMapGL(props) {
     }, [geoLevel, quantiles, colorScale, vintage, selection])
 
     const _renderTooltip = () => {
-        console.log(x)
-        console.log(y)
         return (
             hoveredLocation && (
                 <div className="tooltip" style={{ left: x.current, top: y.current, zIndex: 999, pointerEvents: 'none', position: 'absolute' }}>
@@ -123,14 +120,13 @@ export default function CensusMapGL(props) {
         );
     }
 
-    const _onHover = event => onHover(setHoveredLocation, event, x, y)
 
     return (Object.keys(data).length > 0) ? (
         <ReactMapGL
             mapboxApiAccessToken={process.env.REACT_APP_TOKEN}
             {...viewport}
             onViewportChange={(viewport) => setViewport(viewport)}
-            onHover={_onHover}
+            onHover={event => onHover(setHoveredLocation, event, x, y)}
         >
             <Source type="geojson" data={data}>
                 <Layer {...layer} />
@@ -144,7 +140,7 @@ export default function CensusMapGL(props) {
         );
 }
 
-const onHover = (setHoveredLocation, event, x, y) => {
+export function onHover(setHoveredLocation, event, x, y) {
     const {
         features,
         srcEvent: { offsetX, offsetY }
@@ -155,7 +151,7 @@ const onHover = (setHoveredLocation, event, x, y) => {
     setHoveredLocation(hoveredLocation)
 };
 
-let quantileMaker = function (colorScale, quantiles, min, max) {
+export function quantileMaker(colorScale, quantiles, min, max) {
     let diff = max - min;
     let bucket = diff / quantiles;
     let dataScale = Array.apply(null, { length: quantiles })
