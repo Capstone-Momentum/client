@@ -31,6 +31,9 @@ const useStyles = makeStyles(theme => ({
     button: {
         color: '#2195F2'
     },
+    fullWidth: {
+        width: '100%'
+    }
     // container: {
     //     height: '50%',
     //     width: '50%',
@@ -48,9 +51,8 @@ const availableVintages = [
 ]
 
 const availableGeoLevels = [
-    { geoLevel: 'tract' },
-    { geoLevel: 'county subdivision' },
-    { geoLevel: 'block group' },
+    { geoLevel: 'zip code tabulation area' },
+    { geoLevel: 'county' },
 ]
 
 const defaultSelection = {
@@ -84,7 +86,7 @@ function TabPanel(props) {
 
 export default function CensusMap(props) {
     const [vintage, setVintage] = React.useState({ vintage: "2016" })
-    const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'county subdivision' })
+    const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'zip code tabulation area' })
     const [selection, setSelection] = React.useState(defaultSelection)
     const [selections, setSelections] = React.useState(defaultSelections)
     const [tab, setTab] = React.useState(0)
@@ -231,7 +233,7 @@ export default function CensusMap(props) {
         </Grid>
     )
 
-    const graph = (<CensusBarChart />);
+    const graph = (<CensusBarChart dataset={selection.selection} concept={selection.concept} />);
 
 
 
@@ -244,7 +246,7 @@ export default function CensusMap(props) {
                 <Grid item>
                     <TabPanel value={tab} index={0}>{labeledMap}</TabPanel>
                 </Grid>
-                <Grid item>
+                <Grid item className={classes.fullWidth}>
                     <TabPanel value={tab} index={1}>{graph}</TabPanel>
                 </Grid>
             </Grid>
