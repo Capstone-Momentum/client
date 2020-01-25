@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY } from '../constants';
+import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY, GEOLEVEL_TO_SELECTION } from '../constants';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Typography } from '@material-ui/core';
 let chroma = require("chroma-js");
@@ -45,20 +45,16 @@ export default function CensusMapGL(props) {
         setData({})
         let censusPromise = function () {
             return new Promise(function (resolve, reject) {
-                const geoHierarchy = {
-                    "state": CALIFORNIA_CODE,
-                    "county": SLO_COUNTY_CODE,
-                }
-                geoHierarchy[geoLevel] = '*'
                 census({
                     "vintage": vintage,
-                    "geoHierarchy": geoHierarchy,
+                    "geoHierarchy": GEOLEVEL_TO_SELECTION['zip code tabulation area'],
                     "sourcePath": ["acs", "acs5"],
                     "values": [selection],
                     "statsKey": CENSUS_KEY,
                     "geoResolution": "500k"
                 }, function (err, json) {
                     if (!err) {
+                        console.log(json)
                         resolve(json);
                     } else {
                         reject(err);
@@ -104,22 +100,23 @@ export default function CensusMapGL(props) {
 
     }, [geoLevel, quantiles, colorScale, vintage, selection])
 
-    const _renderTooltip = () => {
-        return (
-            hoveredLocation && (
-                <div className="tooltip" style={{ left: x.current, top: y.current, zIndex: 999, pointerEvents: 'none', position: 'absolute' }}>
-                    <Card className={classes.card}>
-                        <CardContent>
-                            <Typography className={classes.tooltipText} variant='body1'>
-                                {`${getHoveredName(hoveredLocation, geoLevel)}: ${addCommas(hoveredLocation.properties[selection])}`}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </div>
-            )
-        );
-    }
-
+    // const _renderTooltip = () => {
+    //     console.log(x)
+    //     console.log(y)
+    //     return (
+    //         hoveredLocation && (
+    //             <div className="tooltip" style={{ left: x.current, top: y.current, zIndex: 999, pointerEvents: 'none', position: 'absolute' }}>
+    //                 <Card className={classes.card}>
+    //                     <CardContent>
+    //                         <Typography className={classes.tooltipText} variant='body1'>
+    //                             {`${getHoveredName(hoveredLocation, geoLevel)}: ${addCommas(hoveredLocation.properties[selection])}`}
+    //                         </Typography>
+    //                     </CardContent>
+    //                 </Card>
+    //             </div>
+    //         )
+    //     );
+    // }
 
     return (Object.keys(data).length > 0) ? (
         <ReactMapGL
@@ -131,7 +128,7 @@ export default function CensusMapGL(props) {
             <Source type="geojson" data={data}>
                 <Layer {...layer} />
             </Source>
-            {_renderTooltip()}
+            {/* {_renderTooltip()} */}
         </ReactMapGL>
     ) : (
             <div style={{ width: viewport.width, height: viewport.height, backgroundColor: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -162,25 +159,6 @@ export function quantileMaker(colorScale, quantiles, min, max) {
     let chromaScale = normalScale.map(function (val) { return colorScale(val).hex() });
     return _.zip(dataScale, chromaScale);
 };
-
-const geoLevelToFeatureAttribute = {
-    'tract': 'tract',
-    'county subdivision': 'NAME',
-    'block group': 'block-group'
-}
-
-export function getHoveredName(hoveredLocation, geoLevel) {
-    const geoLevelProperty = geoLevelToFeatureAttribute[geoLevel]
-    const location = hoveredLocation.properties[geoLevelProperty]
-    if (geoLevel === 'county subdivision') {
-        return location
-    } else if (geoLevel === 'tract') {
-        return `Tract (${location})`
-    } else if (geoLevel === 'block group') {
-        const tract = hoveredLocation.properties[geoLevelToFeatureAttribute['tract']]
-        return `Tract (${tract}) / Block Group (${location})`
-    }
-}
 
 export function addCommas(x) {
     return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''
