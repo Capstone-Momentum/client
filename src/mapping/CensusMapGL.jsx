@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { SLO_LATITUDE, SLO_LONGITUDE, CALIFORNIA_CODE, SLO_COUNTY_CODE, CENSUS_KEY, GEOLEVEL_TO_SELECTION } from '../constants';
-import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Typography } from '@material-ui/core';
+import { SLO_LATITUDE, SLO_LONGITUDE, CENSUS_KEY, GEOLEVEL_TO_SELECTION } from '../constants';
+import { CensusTooltip } from '../components/tooltip/CensusTooltip';
 let chroma = require("chroma-js");
 const census = require('citysdk')
 let _ = require("lodash");
@@ -14,23 +13,11 @@ let _ = require("lodash");
 // Reference for adding onHover: https://github.com/uber/react-map-gl/blob/5.1-release/examples/geojson/src/app.js
 // Potential alternative free solution to mapping: https://www.react-simple-maps.io/examples/
 
-const useStyles = makeStyles({
-    card: {
-        backgroundColor: 'white'
-    },
-    tooltipText: {
-        textTransform: 'capitalize',
-        whiteSpace: 'nowrap',
-    }
-})
-
 export default function CensusMapGL(props) {
-    const classes = useStyles()
     const { vintage, geoLevel, selection, viewportDefault, quantiles, colorScale } = props
+
+    // React-Map-GL State
     const [data, setData] = React.useState({})
-    const [hoveredLocation, setHoveredLocation] = React.useState(null)
-    const x = React.useRef(0)
-    const y = React.useRef(0)
     const [layer, setLayer] = React.useState({})
     const [viewport, setViewport] = React.useState(
         viewportDefault ? viewportDefault : {
@@ -40,6 +27,11 @@ export default function CensusMapGL(props) {
             longitude: SLO_LONGITUDE,
             zoom: 8
         })
+
+    // Tooltip State
+    const [hoveredLocation, setHoveredLocation] = React.useState(null)
+    const x = React.useRef(0)
+    const y = React.useRef(0)
 
     useEffect(() => {
         setData({})
@@ -54,7 +46,6 @@ export default function CensusMapGL(props) {
                     "geoResolution": "500k"
                 }, function (err, json) {
                     if (!err) {
-                        console.log(json)
                         resolve(json);
                     } else {
                         reject(err);
@@ -100,23 +91,23 @@ export default function CensusMapGL(props) {
 
     }, [geoLevel, quantiles, colorScale, vintage, selection])
 
-    // const _renderTooltip = () => {
-    //     console.log(x)
-    //     console.log(y)
-    //     return (
-    //         hoveredLocation && (
-    //             <div className="tooltip" style={{ left: x.current, top: y.current, zIndex: 999, pointerEvents: 'none', position: 'absolute' }}>
-    //                 <Card className={classes.card}>
-    //                     <CardContent>
-    //                         <Typography className={classes.tooltipText} variant='body1'>
-    //                             {`${getHoveredName(hoveredLocation, geoLevel)}: ${addCommas(hoveredLocation.properties[selection])}`}
-    //                         </Typography>
-    //                     </CardContent>
-    //                 </Card>
-    //             </div>
-    //         )
-    //     );
-    // }
+    const renderTooltip = () => {
+        if (!hoveredLocation) return;
+        const zipsValue = hoveredLocation.properties[selection]
+        const zipCode = hoveredLocation.properties['zip-code-tabulation-area']
+        const tooltipStyle = {
+            left: x.current,
+            top: y.current,
+            zIndex: 999,
+            pointerEvents: 'none',
+            position: 'absolute'
+        }
+        return (
+            <div className="tooltip" style={tooltipStyle}>
+                <CensusTooltip value={zipsValue} zipCode={zipCode} />
+            </div>
+        );
+    }
 
     return (Object.keys(data).length > 0) ? (
         <ReactMapGL
@@ -128,7 +119,7 @@ export default function CensusMapGL(props) {
             <Source type="geojson" data={data}>
                 <Layer {...layer} />
             </Source>
-            {/* {_renderTooltip()} */}
+            {renderTooltip()}
         </ReactMapGL>
     ) : (
             <div style={{ width: viewport.width, height: viewport.height, backgroundColor: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
