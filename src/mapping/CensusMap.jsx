@@ -64,6 +64,47 @@ const defaultSelection = {
     "attributes": "B20005_028M,B20005_028MA,B20005_028EA"
 }
 
+const getSelectionOptions = async (vintage, gender, selectionsForVintageFlattened) => {
+    const selectionsForVintageURL = `https://api.census.gov/data/${vintage.vintage}/acs/acs5/variables.json`
+    const response = await fetch(selectionsForVintageURL, { method: 'GET' })
+    let selectionsForVintage = await response.json()
+    selectionsForVintage = selectionsForVintage.variables
+    // let selectionsForVintageFlattened = []
+
+    // Use materialUI or Javascript filtering
+    if (gender.gender.indexOf('None') !== -1) {
+        Object.keys(selectionsForVintage).forEach(sKey => {
+            selectionsForVintageFlattened.push(
+                {
+                    selection: sKey,
+                    ...selectionsForVintage[sKey]
+                }
+            )
+        })
+    } 
+    else {
+        Object.keys(selectionsForVintage).forEach(sKey => {
+            if (typeof(selectionsForVintage[sKey].label) != "string" || 
+            typeof(selectionsForVintage[sKey].concept) != "string") {
+                ;
+            }
+            else if (selectionsForVintage[sKey].label.indexOf(gender.gender) !== -1 || 
+            selectionsForVintage[sKey].concept.indexOf(gender.gender) !== -1) {
+                selectionsForVintageFlattened.push(
+                    {
+                        selection: sKey,
+                        ...selectionsForVintage[sKey]
+                    }
+                )
+            }
+
+        })
+    }
+    // I want to call the function in the react component
+    //setSelections(selectionsForVintageFlattened)
+    //setSelection(selectionsForVintageFlattened[3])
+}
+
 const defaultSelections = [defaultSelection]
 
 export default function CensusMap(props) {
@@ -75,47 +116,12 @@ export default function CensusMap(props) {
     const classes = useStyles()
 
     useEffect(() => {
-        const getSelectionOptions = async () => {
-            const selectionsForVintageURL = `https://api.census.gov/data/${vintage.vintage}/acs/acs5/variables.json`
-            const response = await fetch(selectionsForVintageURL, { method: 'GET' })
-            let selectionsForVintage = await response.json()
-            selectionsForVintage = selectionsForVintage.variables
-            let selectionsForVintageFlattened = []
-
-            // Use materialUI or Javascript filtering
-            if (gender.gender.indexOf('None') !== -1) {
-                Object.keys(selectionsForVintage).forEach(sKey => {
-                    selectionsForVintageFlattened.push(
-                        {
-                            selection: sKey,
-                            ...selectionsForVintage[sKey]
-                        }
-                    )
-                })
-            } 
-            else {
-                Object.keys(selectionsForVintage).forEach(sKey => {
-                    if (typeof(selectionsForVintage[sKey].label) != "string" || 
-                    typeof(selectionsForVintage[sKey].concept) != "string") {
-                        ;
-                    }
-                    else if (selectionsForVintage[sKey].label.indexOf(gender.gender) !== -1 || 
-                    selectionsForVintage[sKey].concept.indexOf(gender.gender) !== -1) {
-                        selectionsForVintageFlattened.push(
-                            {
-                                selection: sKey,
-                                ...selectionsForVintage[sKey]
-                            }
-                        )
-                    }
-
-                })
-            }
-            
-            setSelections(selectionsForVintageFlattened)
-            setSelection(selectionsForVintageFlattened[3])
-        }
-        getSelectionOptions()
+        let selectionsForVintageFlattened = []
+        console.log("hello")
+        getSelectionOptions(vintage, gender, selectionsForVintageFlattened)
+        console.log(selectionsForVintageFlattened)
+        setSelections(selectionsForVintageFlattened)
+        setSelection(selectionsForVintageFlattened[3])
     }, [vintage, gender])
 
     const sidebar = (
