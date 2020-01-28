@@ -5,7 +5,7 @@ import React from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label
 } from 'recharts';
-import { useEffect } from 'react';
+//import { useEffect } from 'react';
 const census = require('citysdk')
 
 const geoLevelToSelection = {
@@ -85,7 +85,7 @@ export function CustomToolTip({ active, payload, label }) {
 
 export default function CensusBarChart() {
     const [data, setData] = React.useState({})
-    useEffect(() => {
+    React.useEffect(() => {
         let censusPromise = function () {
             return new Promise(function (resolve, reject) {
                 // this is where we would populate the API call
