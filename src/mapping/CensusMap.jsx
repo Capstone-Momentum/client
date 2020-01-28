@@ -34,10 +34,6 @@ const useStyles = makeStyles(theme => ({
     fullWidth: {
         width: '100%'
     }
-    // container: {
-    //     height: '50%',
-    //     width: '50%',
-    // }
 }))
 
 const availableVintages = [
@@ -51,8 +47,10 @@ const availableVintages = [
 ]
 
 const availableGeoLevels = [
+    { geoLevel: 'tract' },
+    { geoLevel: 'county subdivision' },
+    { geoLevel: 'block group' },
     { geoLevel: 'zip code tabulation area' },
-    { geoLevel: 'county' },
 ]
 
 const defaultSelection = {
@@ -87,8 +85,8 @@ function TabPanel(props) {
 export default function CensusMap(props) {
     const [vintage, setVintage] = React.useState({ vintage: "2016" })
     const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'zip code tabulation area' })
-    const [selection, setSelection] = React.useState(defaultSelection)
-    const [selections, setSelections] = React.useState(defaultSelections)
+    const [selection, setSelection] = React.useState(undefined)
+    const [selections, setSelections] = React.useState([])
     const [tab, setTab] = React.useState(0)
     const classes = useStyles()
 
@@ -114,7 +112,7 @@ export default function CensusMap(props) {
     }, [vintage])
 
     const sidebar = (
-        <Card className={classes.sidebar} elevation={4}>
+        <Card className={classes.sidebar} elevation={5}>
             <CardContent className={classes.cardContent}>
                 <Grid className={classes.outerGridColumn} container direction='column' justify='space-between'>
                     <Grid className={classes.innerGridColumn} item container direction='column' spacing={2}>
@@ -199,7 +197,7 @@ export default function CensusMap(props) {
         </Card>
     )
 
-    const labeledMap = (
+    const labeledMap = selection ? (
         <Grid item container direction='column' xs={8} spacing={2}>
             <Grid item>
                 <Container className={classes.container}>
@@ -231,9 +229,9 @@ export default function CensusMap(props) {
                 </Card>
             </Grid>
         </Grid>
-    )
+    ) : <div />
 
-    const graph = (<CensusBarChart dataset={selection.selection} concept={selection.concept} />);
+    const graph = selection ? (<CensusBarChart dataset={selection.selection} concept={selection.concept} />) : <div />
 
 
 

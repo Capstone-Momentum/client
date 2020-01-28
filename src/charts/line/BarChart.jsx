@@ -1,11 +1,12 @@
 import {
-    CENSUS_KEY, CCSR_COUNTIES, CCSR_CITY_ZIPS, GEOLEVEL_TO_FEATUREATTR, CCSR_ZIPS, CCSR_SUBDIVS, CCSR_TRACTS, CCSR_BLOCKS, GEOLEVEL_TO_SELECTION
+    CENSUS_KEY, CCSR_CITY_ZIPS, GEOLEVEL_TO_FEATUREATTR, GEOLEVEL_TO_SELECTION
 } from '../../constants';
 import React from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label
 } from 'recharts';
 import { useEffect } from 'react';
+import { CensusTooltip } from '../../components/tooltip/CensusTooltip';
 const census = require('citysdk')
 
 
@@ -20,8 +21,6 @@ const geoLevelToTitle = {
 // default: median household income by zip code
 const year = "2018"
 const geoLevel = "zip code tabulation area"
-const concept = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATION-ADJUSTED DOLLARS)"
-const formatConcept = concept.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
 
 //get the cities corresponding with the given zip
 export function correspondingCities(zip) {
@@ -49,19 +48,8 @@ export function addCommas(x) {
 // tooltip custom text and background
 export function CustomToolTip({ active, payload, label }) {
     if (active && payload) {
-        const tooltip = {
-            backgroundColor: 'white',
-            opacity: '0.9',
-            border: '1px solid black',
-            borderRadius: '15px',
-            paddingLeft: '10px',
-            paddingRight: '10px'
-        }
         return (
-            <div className="custom-tooltip" style={tooltip} >
-                <p className="label">{`Value: ${addCommas(payload[0].value)}`}</p>
-                <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label} (${correspondingCities(label)})`}</p>
-            </div>
+            <CensusTooltip value={payload[0].value} zipCode={label} />
         );
     }
     return null;
