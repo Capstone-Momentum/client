@@ -3,7 +3,7 @@ import {
 } from '../../constants';
 import React from 'react';
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceLine
 } from 'recharts';
 import { useEffect } from 'react';
 import { CensusTooltip } from '../../components/tooltip/CensusTooltip';
@@ -27,6 +27,11 @@ export function correspondingCities(zip) {
     let result = Object.keys(CCSR_CITY_ZIPS).filter(key => CCSR_CITY_ZIPS[key].includes(zip))
     return result.join(', ');
 }
+
+//format the concept for the title of the graph
+export function formatConcept(concept){
+    return concept.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+} 
 
 export function getAPICall(year, geoLevel, dataset, concept) {
     const geoSelection = GEOLEVEL_TO_SELECTION[geoLevel]
@@ -53,6 +58,19 @@ export function CustomToolTip({ active, payload, label }) {
         );
     }
     return null;
+};
+
+// ideally to add stats to the graph...
+function calculateAverage(dataset, datakey) {
+    console.log(dataset)
+	const count = dataset.length;
+    let item = null;
+    let sum = 0;
+    for (let i = 0; i < count; i++) {
+        item = dataset[i][datakey];
+        sum = item + sum;
+    }
+    return sum/count;
 };
 
 export default function CensusBarChart(props) {
@@ -82,7 +100,7 @@ export default function CensusBarChart(props) {
     return (
         <div className="bar chart">
             <h2 align="center">
-                {concept}
+                {formatConcept(concept)}
             </h2>
             <ResponsiveContainer width="100%" height={600}>
                 <BarChart cx="50%" cy="50%" outerRadius="80%"
@@ -97,6 +115,7 @@ export default function CensusBarChart(props) {
                     </YAxis>
                     <Tooltip filterNull={false} content={CustomToolTip} />
                     <Bar dataKey={dataset} fill="#8884d8" />
+                    <ReferenceLine y={calculateAverage(data, dataset)} label={"Average: " + calculateAverage(data, dataset)} stroke="green" strokeDasharray="3 3"/>
                 </BarChart>
             </ResponsiveContainer>
         </div>
