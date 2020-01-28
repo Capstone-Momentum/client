@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useEffect } from 'react';
 import { CensusTooltip } from '../../components/tooltip/CensusTooltip';
+import green from '@material-ui/core/colors/green';
 const census = require('citysdk')
 
 
@@ -114,8 +115,8 @@ export default function CensusBarChart(props) {
                         <Label value={'Value'} angle={-90} offset={-10} position="insideLeft" />
                     </YAxis>
                     <Tooltip filterNull={false} content={CustomToolTip} />
-                    <Bar dataKey={dataset} fill="#8884d8" />
-                    <ReferenceLine y={calculateAverage(data, dataset)} label={"Average: " + calculateAverage(data, dataset)} stroke="green" strokeDasharray="3 3"/>
+                    <Bar dataKey={dataset} fill={green[500]} />
+                    <ReferenceLine y={calculateAverage(data, dataset)} label={"Average: " + calculateAverage(data, dataset)} stroke='#00bfa5' strokeDasharray="3 3"/>
                 </BarChart>
             </ResponsiveContainer>
         </div>

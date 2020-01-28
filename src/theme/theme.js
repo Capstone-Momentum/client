@@ -7,6 +7,7 @@ export const theme = responsiveFontSizes(
     createMuiTheme({
         palette: {
             primary: green,
+            secondary: { main: '#00bfa5', },
         },
         status: {
             danger: 'red',
