@@ -30,7 +30,7 @@ import DataViewer from './containers/DataViewer';
 function App() {
   const landing = (
     <Route path={LANDING} exact>
-      <Landing />
+      <InteractiveMap />
     </Route>
   )
   const interactiveMap = (

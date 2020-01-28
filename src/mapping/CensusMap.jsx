@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import CensusMapGL from './CensusMapGL';
 import Autocomplete from '../components/autocomplete/Autocomplete';
 import VirtualizedAutocomplete from '../components/autocomplete/VirtualizedAutocomplete'
-import { Typography, CardContent, Card, Divider, Grid, Container, Button } from '@material-ui/core';
+import { Typography, CardContent, Card, Divider, Grid, Container, Button, Tabs, Tab, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import CensusBarChart from '../charts/line/BarChart';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,13 +22,17 @@ const useStyles = makeStyles(theme => ({
     },
     sidebar: {
         padding: '2%',
-        height: '100%'
+        height: '80vh',
+        width: '30vw'
     },
     lowercaseTypography: {
         textTransform: 'lowercase'
     },
     button: {
         color: '#2195F2'
+    },
+    fullWidth: {
+        width: '100%'
     }
 }))
 
@@ -45,6 +50,7 @@ const availableGeoLevels = [
     { geoLevel: 'tract' },
     { geoLevel: 'county subdivision' },
     { geoLevel: 'block group' },
+    { geoLevel: 'zip code tabulation area' },
 ]
 
 const defaultSelection = {
@@ -59,11 +65,29 @@ const defaultSelection = {
 
 const defaultSelections = [defaultSelection]
 
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <Typography
+            component="div"
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {value === index && <Box p={3}>{children}</Box>}
+        </Typography>
+    );
+}
+
 export default function CensusMap(props) {
     const [vintage, setVintage] = React.useState({ vintage: "2016" })
-    const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'county subdivision' })
-    const [selection, setSelection] = React.useState(defaultSelection)
-    const [selections, setSelections] = React.useState(defaultSelections)
+    const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'zip code tabulation area' })
+    const [selection, setSelection] = React.useState(undefined)
+    const [selections, setSelections] = React.useState([])
+    const [tab, setTab] = React.useState(0)
     const classes = useStyles()
 
     useEffect(() => {
@@ -88,14 +112,15 @@ export default function CensusMap(props) {
     }, [vintage])
 
     const sidebar = (
-        <Card className={classes.sidebar} elevation={4}>
+        <Card className={classes.sidebar} elevation={5}>
             <CardContent className={classes.cardContent}>
                 <Grid className={classes.outerGridColumn} container direction='column' justify='space-between'>
                     <Grid className={classes.innerGridColumn} item container direction='column' spacing={2}>
                         <Grid item>
-                            <Typography variant='h5'>
-                                Interact with the Map
-                        </Typography>
+                            <Tabs value={tab} onChange={(event, newVal) => setTab(newVal)} indicatorColor="primary">
+                                <Tab label="Map" />
+                                <Tab label="Graph" />
+                            </Tabs>
                         </Grid>
                         <Grid item>
                             <Divider />
@@ -172,7 +197,7 @@ export default function CensusMap(props) {
         </Card>
     )
 
-    const labeledMap = (
+    const labeledMap = selection ? (
         <Grid item container direction='column' xs={8} spacing={2}>
             <Grid item>
                 <Container className={classes.container}>
@@ -204,14 +229,25 @@ export default function CensusMap(props) {
                 </Card>
             </Grid>
         </Grid>
-    )
+    ) : <div />
+
+    const graph = selection ? (<CensusBarChart dataset={selection.selection} concept={selection.concept} />) : <div />
+
+
 
     return (
-        <Grid className={classes.root} container direction='row' spacing={4}>
+        <Grid className={classes.root} container direction='row' spacing={4} wrap='nowrap'>
             <Grid item xs={4}>
                 {sidebar}
             </Grid>
-            {labeledMap}
+            <Grid item container direction='column' xs={8} spacing={2} alignItems='center' >
+                <Grid item>
+                    <TabPanel value={tab} index={0}>{labeledMap}</TabPanel>
+                </Grid>
+                <Grid item className={classes.fullWidth}>
+                    <TabPanel value={tab} index={1}>{graph}</TabPanel>
+                </Grid>
+            </Grid>
         </Grid>
     )
 }

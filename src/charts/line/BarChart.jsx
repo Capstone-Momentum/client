@@ -1,28 +1,14 @@
 import {
-    CENSUS_KEY, CCSR_COUNTIES, CCSR_CITY_ZIPS, CCSR_CITIES, CCSR_ZIPS, CCSR_SUBDIVS, CCSR_TRACTS, CCSR_BLOCKS
+    CENSUS_KEY, CCSR_CITY_ZIPS, GEOLEVEL_TO_FEATUREATTR, GEOLEVEL_TO_SELECTION
 } from '../../constants';
 import React from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label
 } from 'recharts';
-//import { useEffect } from 'react';
+import { useEffect } from 'react';
+import { CensusTooltip } from '../../components/tooltip/CensusTooltip';
 const census = require('citysdk')
 
-const geoLevelToSelection = {
-    'county': { 'county': CCSR_COUNTIES },
-    'tract': { 'tract': CCSR_TRACTS },
-    'county subdivision': { 'county-subdivision': CCSR_SUBDIVS },
-    'block group': { 'block group': CCSR_BLOCKS },
-    'zip code tabulation area': { 'zip code tabulation area': CCSR_ZIPS }
-}
-
-const geoLevelToFeatureAttribute = {
-    'county': 'NAME',
-    'tract': 'tract',
-    'county subdivision': 'NAME',
-    'block group': 'block-group',
-    'zip code tabulation area': 'zip-code-tabulation-area'
-}
 
 const geoLevelToTitle = {
     'county': 'County',
@@ -35,9 +21,6 @@ const geoLevelToTitle = {
 // default: median household income by zip code
 const year = "2018"
 const geoLevel = "zip code tabulation area"
-const dataset = "B19013_001E"
-const concept = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATION-ADJUSTED DOLLARS)"
-const formatConcept = concept.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
 
 //get the cities corresponding with the given zip
 export function correspondingCities(zip) {
@@ -46,7 +29,7 @@ export function correspondingCities(zip) {
 }
 
 export function getAPICall(year, geoLevel, dataset, concept) {
-    const geoSelection = geoLevelToSelection[geoLevel]
+    const geoSelection = GEOLEVEL_TO_SELECTION[geoLevel]
     return {
         "vintage": year,
         "geoHierarchy": geoSelection,
@@ -65,25 +48,15 @@ export function addCommas(x) {
 // tooltip custom text and background
 export function CustomToolTip({ active, payload, label }) {
     if (active && payload) {
-        const tooltip = {
-            backgroundColor: 'white',
-            opacity: '0.9',
-            border: '1px solid black',
-            borderRadius: '15px',
-            paddingLeft: '10px',
-            paddingRight: '10px'
-        }
         return (
-            <div className="custom-tooltip" style={tooltip} >
-                <p className="label">{`${formatConcept}: ${addCommas(payload[0].value)}`}</p>
-                <p className="desc">{`${geoLevelToTitle[geoLevel]}: ${label} (${correspondingCities(label)})`}</p>
-            </div>
+            <CensusTooltip value={payload[0].value} zipCode={label} />
         );
     }
     return null;
 };
 
-export default function CensusBarChart() {
+export default function CensusBarChart(props) {
+    const { dataset, concept } = props;
     const [data, setData] = React.useState({})
     React.useEffect(() => {
         let censusPromise = function () {
@@ -104,23 +77,23 @@ export default function CensusBarChart() {
             setData(result);
         }
         retrieveData();
-    }, [])
+    }, [dataset, concept])
 
     return (
         <div className="bar chart">
             <h2 align="center">
-                {formatConcept} per Central Coast {geoLevelToTitle[geoLevel]} in {year}
+                {concept}
             </h2>
             <ResponsiveContainer width="100%" height={600}>
                 <BarChart cx="50%" cy="50%" outerRadius="80%"
                     data={data}
-                    margin={{ top: 10, right: 10, left: 40, bottom: 30 }}           >
+                    margin={{ top: 10, right: 10, left: 40, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey={geoLevelToFeatureAttribute[geoLevel]} >
+                    <XAxis dataKey={GEOLEVEL_TO_FEATUREATTR[geoLevel]} >
                         <Label value={geoLevelToTitle[geoLevel]} position="bottom" />
                     </XAxis>
                     <YAxis >
-                        <Label value={formatConcept} angle={-90} offset={-1} position="insideBottomLeft" width={542} />
+                        <Label value={'Value'} angle={-90} offset={-10} position="insideLeft" />
                     </YAxis>
                     <Tooltip filterNull={false} content={CustomToolTip} />
                     <Bar dataKey={dataset} fill="#8884d8" />
