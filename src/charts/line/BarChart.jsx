@@ -62,7 +62,7 @@ export function CustomToolTip({ active, payload, label }) {
 };
 
 // ideally to add stats to the graph...
-function calculateAverage(dataset, datakey) {
+export function calculateAverage(dataset, datakey) {
     console.log(dataset)
 	const count = dataset.length;
     let item = null;
