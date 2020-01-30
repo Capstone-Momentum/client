@@ -24,7 +24,7 @@ export function CensusTooltip(props) {
                     {`Value: ${addCommas(value)}`}
                 </Typography>
                 <Typography className={classes.tooltipText} variant='body1'>
-                    {`Zip Code: ${zipCode} (${correspondingCities(zipCode)}))`}
+                    {`Zip Code: ${zipCode} (${correspondingCities(zipCode)})`}
                 </Typography>
             </CardContent>
         </Card>

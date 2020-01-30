@@ -3,10 +3,11 @@ import {
 } from '../../constants';
 import React from 'react';
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceLine
 } from 'recharts';
 import { useEffect } from 'react';
 import { CensusTooltip } from '../../components/tooltip/CensusTooltip';
+import green from '@material-ui/core/colors/green';
 const census = require('citysdk')
 
 
@@ -21,12 +22,19 @@ const geoLevelToTitle = {
 // default: median household income by zip code
 const year = "2018"
 const geoLevel = "zip code tabulation area"
+// const dataset = "B19013_001E"
+// const concept = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATION-ADJUSTED DOLLARS)"
 
 //get the cities corresponding with the given zip
 export function correspondingCities(zip) {
     let result = Object.keys(CCSR_CITY_ZIPS).filter(key => CCSR_CITY_ZIPS[key].includes(zip))
     return result.join(', ');
 }
+
+//format the concept for the title of the graph
+export function formatConcept(concept){
+    return concept.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+} 
 
 export function getAPICall(year, geoLevel, dataset, concept) {
     const geoSelection = GEOLEVEL_TO_SELECTION[geoLevel]
@@ -55,10 +63,36 @@ export function CustomToolTip({ active, payload, label }) {
     return null;
 };
 
+// add median line to graph
+export function calculateAverage(dataset, datakey) {
+	const count = dataset.length;
+    let item = null;
+    let sum = 0;
+    for (let i = 0; i < count; i++) {
+        item = dataset[i][datakey];
+        sum = item + sum;
+    }
+    console.log(sum/count);
+    return sum/count;
+};
+
+// filter out data where the value is unknown (less than zero)
+export function filterUnknowns(dataset, datakey) {
+    const count = dataset.length;
+    let newDataset = [];
+    for (let i = 0; i < count; i++) {
+        if (dataset[i][datakey] >= 0){
+            newDataset.push(dataset[i]);
+        }
+    }
+    console.log(newDataset);
+    return newDataset;
+};
+
 export default function CensusBarChart(props) {
     const { dataset, concept } = props;
     const [data, setData] = React.useState({})
-    useEffect(() => {
+    React.useEffect(() => {
         let censusPromise = function () {
             return new Promise(function (resolve, reject) {
                 // this is where we would populate the API call
@@ -78,15 +112,16 @@ export default function CensusBarChart(props) {
         }
         retrieveData();
     }, [dataset, concept])
-
+    const filteredData = filterUnknowns(data, dataset)
+    const average = calculateAverage(filteredData, dataset)
     return (
         <div className="bar chart">
             <h2 align="center">
-                {concept}
+                {formatConcept(concept)}
             </h2>
             <ResponsiveContainer width="100%" height={600}>
                 <BarChart cx="50%" cy="50%" outerRadius="80%"
-                    data={data}
+                    data={filteredData}
                     margin={{ top: 10, right: 10, left: 40, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey={GEOLEVEL_TO_FEATUREATTR[geoLevel]} >
@@ -96,7 +131,8 @@ export default function CensusBarChart(props) {
                         <Label value={'Value'} angle={-90} offset={-10} position="insideLeft" />
                     </YAxis>
                     <Tooltip filterNull={false} content={CustomToolTip} />
-                    <Bar dataKey={dataset} fill="#8884d8" />
+                    <Bar dataKey={dataset} fill={green[500]} />
+                    <ReferenceLine y={average} label={"Average: " + average} stroke='#00bfa5' strokeDasharray="3 3" />
                 </BarChart>
             </ResponsiveContainer>
         </div>
