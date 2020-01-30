@@ -22,6 +22,8 @@ const geoLevelToTitle = {
 // default: median household income by zip code
 const year = "2018"
 const geoLevel = "zip code tabulation area"
+// const dataset = "B19013_001E"
+// const concept = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2018 INFLATION-ADJUSTED DOLLARS)"
 
 //get the cities corresponding with the given zip
 export function correspondingCities(zip) {
@@ -70,6 +72,7 @@ export function calculateAverage(dataset, datakey) {
         item = dataset[i][datakey];
         sum = item + sum;
     }
+    console.log(sum/count);
     return sum/count;
 };
 
@@ -109,7 +112,8 @@ export default function CensusBarChart(props) {
         }
         retrieveData();
     }, [dataset, concept])
-
+    const filteredData = filterUnknowns(data, dataset)
+    const average = calculateAverage(filteredData, dataset)
     return (
         <div className="bar chart">
             <h2 align="center">
@@ -117,7 +121,7 @@ export default function CensusBarChart(props) {
             </h2>
             <ResponsiveContainer width="100%" height={600}>
                 <BarChart cx="50%" cy="50%" outerRadius="80%"
-                    data={filterUnknowns(data, dataset)}
+                    data={filteredData}
                     margin={{ top: 10, right: 10, left: 40, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey={GEOLEVEL_TO_FEATUREATTR[geoLevel]} >
@@ -128,7 +132,7 @@ export default function CensusBarChart(props) {
                     </YAxis>
                     <Tooltip filterNull={false} content={CustomToolTip} />
                     <Bar dataKey={dataset} fill={green[500]} />
-                    <ReferenceLine y={calculateAverage(data, dataset)} label={{ value:"Average: " + calculateAverage(data, dataset), offset:5 }} stroke='#00bfa5' strokeDasharray="3 3"/>
+                    <ReferenceLine y={average} label={"Average: " + average} stroke='#00bfa5' strokeDasharray="3 3" />
                 </BarChart>
             </ResponsiveContainer>
         </div>

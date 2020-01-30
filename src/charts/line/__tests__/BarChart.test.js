@@ -59,7 +59,7 @@ describe("bar graph tests", () => {
     });
 
     test('corresponding cities', () => {
-        expect(correspondingCities("93422")).toBe("93422, 93423");
+        expect(correspondingCities("93422")).toBe("Atascadero");
     });
     test('format concept', () => {
         expect(formatConcept("HELLO WORLD")).toBe("Hello World");
