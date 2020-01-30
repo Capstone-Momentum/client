@@ -1,4 +1,4 @@
-import CensusBarChart, { getAPICall, CustomToolTip, addCommas, correspondingCities, formatConcept, calculateAverage } from '../BarChart';
+import CensusBarChart, { getAPICall, CustomToolTip, addCommas, correspondingCities, formatConcept, calculateAverage, filterUnknowns } from '../BarChart';
 import {
     CALIFORNIA_CODE, CENSUS_KEY, CCSR_COUNTIES, CCSR_ZIPS
 } from '../../../constants';
@@ -67,6 +67,11 @@ describe("bar graph tests", () => {
     test('calculate average', () => {
         const data = [{'x':10, 'y':20}, {'x':20, 'y':30}];
         expect(calculateAverage(data, 'x')).toBe(15);
+    });
+    test('filter unknowns', () => {
+        const data = [{'x':10, 'y':20}, {'x':-10, 'y':30}];
+        const expected = [{'x':10, 'y':20}]
+        expect(filterUnknowns(data, 'x')).toStrictEqual(expected);
     });
 
 });

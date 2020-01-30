@@ -61,9 +61,8 @@ export function CustomToolTip({ active, payload, label }) {
     return null;
 };
 
-// ideally to add stats to the graph...
+// add median line to graph
 export function calculateAverage(dataset, datakey) {
-    console.log(dataset)
 	const count = dataset.length;
     let item = null;
     let sum = 0;
@@ -72,6 +71,19 @@ export function calculateAverage(dataset, datakey) {
         sum = item + sum;
     }
     return sum/count;
+};
+
+// filter out data where the value is unknown (less than zero)
+export function filterUnknowns(dataset, datakey) {
+    const count = dataset.length;
+    let newDataset = [];
+    for (let i = 0; i < count; i++) {
+        if (dataset[i][datakey] >= 0){
+            newDataset.push(dataset[i]);
+        }
+    }
+    console.log(newDataset);
+    return newDataset;
 };
 
 export default function CensusBarChart(props) {
@@ -105,7 +117,7 @@ export default function CensusBarChart(props) {
             </h2>
             <ResponsiveContainer width="100%" height={600}>
                 <BarChart cx="50%" cy="50%" outerRadius="80%"
-                    data={data}
+                    data={filterUnknowns(data, dataset)}
                     margin={{ top: 10, right: 10, left: 40, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey={GEOLEVEL_TO_FEATUREATTR[geoLevel]} >
@@ -116,7 +128,7 @@ export default function CensusBarChart(props) {
                     </YAxis>
                     <Tooltip filterNull={false} content={CustomToolTip} />
                     <Bar dataKey={dataset} fill={green[500]} />
-                    <ReferenceLine y={calculateAverage(data, dataset)} label={"Average: " + calculateAverage(data, dataset)} stroke='#00bfa5' strokeDasharray="3 3"/>
+                    <ReferenceLine y={calculateAverage(data, dataset)} label={{ value:"Average: " + calculateAverage(data, dataset), offset:5 }} stroke='#00bfa5' strokeDasharray="3 3"/>
                 </BarChart>
             </ResponsiveContainer>
         </div>
