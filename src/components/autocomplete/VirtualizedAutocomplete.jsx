@@ -11,8 +11,8 @@ function renderRow(props) {
 
     return React.cloneElement(data[index], {
         style: {
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            // overflow: 'hidden',
+            // textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             display: 'block',
             ...style,
