@@ -14,7 +14,7 @@ let _ = require("lodash");
 // Potential alternative free solution to mapping: https://www.react-simple-maps.io/examples/
 
 export default function CensusMapGL(props) {
-    const { vintage, geoLevel, selection, viewportDefault, quantiles, colorScale } = props
+    const { vintage, geoLevel, selection, gender, viewportDefault, quantiles, colorScale } = props
 
     // React-Map-GL State
     const [data, setData] = React.useState({})

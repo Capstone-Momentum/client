@@ -6,13 +6,20 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
 import { FixedSizeList } from 'react-window';
 
+// TODO: Make sure the text highlight is the entire text.
+
 function renderRow(props) {
     const { data, index, style } = props;
 
     return React.cloneElement(data[index], {
         style: {
-            // overflow: 'hidden',
-            // textOverflow: 'ellipsis',
+            // Causes the ellipses and removed text.
+            //overflow: 'hidden',
+            //textOverflow: 'ellipsis',
+
+            // Might be able to play with whitespace here to adjust block and get wrapping.
+            //flex: 1,
+            //flexWrap: 'wrap',
             whiteSpace: 'nowrap',
             display: 'block',
             ...style,
@@ -62,6 +69,7 @@ const useStyles = makeStyles({
             margin: 0,
         },
     },
+    
 });
 
 export default function VirtualizedAutocomplete(props) {

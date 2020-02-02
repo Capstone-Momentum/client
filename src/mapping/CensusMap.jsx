@@ -53,14 +53,61 @@ const availableGeoLevels = [
     { geoLevel: 'zip code tabulation area' },
 ]
 
+const genders = [
+    {gender: 'None'},
+    {gender: 'Male'},
+    {gender: 'Female'},
+]
+
 const defaultSelection = {
     "selection": "B20005_028E",
     "label": "Estimate!!Total!!Male!!Other!!With earnings",
     "concept": "SEX BY WORK EXPERIENCE IN THE PAST 12 MONTHS BY EARNINGS IN THE PAST 12 MONTHS (IN 2017 INFLATION-ADJUSTED DOLLARS) FOR THE POPULATION 16 YEARS AND OVER",
+    "gender": "None",
     "predicateType": "int",
     "group": "B20005",
     "limit": 0,
     "attributes": "B20005_028M,B20005_028MA,B20005_028EA"
+}
+
+const getSelectionOptions = async (vintage, gender, setSelection, setSelections) => {
+    const selectionsForVintageURL = `https://api.census.gov/data/${vintage.vintage}/acs/acs5/variables.json`
+    const response = await fetch(selectionsForVintageURL, { method: 'GET' })
+    let selectionsForVintage = await response.json()
+    selectionsForVintage = selectionsForVintage.variables
+    let selectionsForVintageFlattened = []
+
+    // Use materialUI or Javascript filtering
+    if (gender.gender.indexOf('None') !== -1) {
+        Object.keys(selectionsForVintage).forEach(sKey => {
+            selectionsForVintageFlattened.push(
+                {
+                    selection: sKey,
+                    ...selectionsForVintage[sKey]
+                }
+            )
+        })
+    } 
+    else {
+        Object.keys(selectionsForVintage).forEach(sKey => {
+            if (typeof(selectionsForVintage[sKey].label) != "string" || 
+            typeof(selectionsForVintage[sKey].concept) != "string") {
+                ;
+            }
+            else if (selectionsForVintage[sKey].label.indexOf(gender.gender) !== -1 || 
+            selectionsForVintage[sKey].concept.indexOf(gender.gender) !== -1) {
+                selectionsForVintageFlattened.push(
+                    {
+                        selection: sKey,
+                        ...selectionsForVintage[sKey]
+                    }
+                )
+            }
+
+        })
+    }
+    setSelections(selectionsForVintageFlattened)
+    setSelection(selectionsForVintageFlattened[3])
 }
 
 const defaultSelections = [defaultSelection]
@@ -85,31 +132,15 @@ function TabPanel(props) {
 export default function CensusMap(props) {
     const [vintage, setVintage] = React.useState({ vintage: "2016" })
     const [geoLevel, setGeoLevel] = React.useState({ geoLevel: 'zip code tabulation area' })
+    const [gender, setGender] = React.useState({ gender: 'None' })
     const [selection, setSelection] = React.useState(undefined)
     const [selections, setSelections] = React.useState([])
     const [tab, setTab] = React.useState(0)
     const classes = useStyles()
 
     useEffect(() => {
-        const getSelectionOptions = async () => {
-            const selectionsForVintageURL = `https://api.census.gov/data/${vintage.vintage}/acs/acs5/variables.json`
-            const response = await fetch(selectionsForVintageURL, { method: 'GET' })
-            let selectionsForVintage = await response.json()
-            selectionsForVintage = selectionsForVintage.variables
-            const selectionsForVintageFlattened = []
-            Object.keys(selectionsForVintage).forEach(sKey => {
-                selectionsForVintageFlattened.push(
-                    {
-                        selection: sKey,
-                        ...selectionsForVintage[sKey]
-                    }
-                )
-            })
-            setSelections(selectionsForVintageFlattened)
-            setSelection(selectionsForVintageFlattened[3])
-        }
-        getSelectionOptions()
-    }, [vintage])
+        getSelectionOptions(vintage, gender, setSelection, setSelections)
+    }, [vintage, gender])
 
     const sidebar = (
         <Card className={classes.sidebar} elevation={5}>
@@ -149,6 +180,16 @@ export default function CensusMap(props) {
                                 onChange={(e, v) => setGeoLevel(v)}
                                 options={availableGeoLevels}
                                 optionLabelAttr='geoLevel'
+                                disableClearable
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Autocomplete
+                                label='Gender'
+                                value={gender}
+                                onChange={(e, v) => setGender(v)}
+                                options={genders}
+                                optionLabelAttr='gender'
                                 disableClearable
                             />
                         </Grid>
